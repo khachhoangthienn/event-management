@@ -14,7 +14,6 @@ import { FaRegImages } from "react-icons/fa";
 import { GiPublicSpeaker } from "react-icons/gi";
 import { IoMdSend } from "react-icons/io";
 
-
 import ReactStars from "react-stars";
 import { Button } from './ui/button';
 

@@ -53,7 +53,7 @@ const PricingPlan = () => {
                         <div className='flex text-orange-600 absolute right-2 top-1 gap-2'>
                             <FaStar size={25} />
                         </div>
-                        <div className='absolute gap-4 border border-blue-800 hover:text-cyan-900 hover:bg-white bg-blue-800 duration-300  rounded-tr-2xl rounded-br-2xl w-fit h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl px-4'>
+                        <div className='absolute gap-4 border border-cyan-900 hover:text-cyan-900 hover:bg-white bg-cyan-900 duration-300  rounded-tr-2xl rounded-br-2xl w-fit h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl px-4'>
                             <RiVipCrownLine />
                             <p>Basic Packages</p>
                         </div>
@@ -107,7 +107,7 @@ const PricingPlan = () => {
                             <FaStar size={25} />
                             <FaStar size={25} />
                         </div>
-                        <div className='absolute gap-4 border border-blue-800 hover:text-cyan-900 hover:bg-white bg-blue-800 duration-300  rounded-tr-2xl rounded-br-2xl  h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl px-4 w-fit'>
+                        <div className='absolute gap-4 border border-cyan-900 hover:text-cyan-900 hover:bg-white bg-cyan-900  duration-300  rounded-tr-2xl rounded-br-2xl  h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl px-4 w-fit'>
                             <RiVipCrownLine />
                             <p>Standard Packages</p>
                         </div>
@@ -160,7 +160,7 @@ const PricingPlan = () => {
                             <FaStar size={25} />
                             <FaStar size={25} />
                         </div>
-                        <div className='absolute gap-4 border border-blue-800 hover:text-cyan-900 hover:bg-white bg-blue-800 duration-300  rounded-tr-2xl rounded-br-2xl h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl px-4 w-fit'>
+                        <div className='absolute gap-4 border border-cyan-900 hover:text-cyan-900 hover:bg-white bg-cyan-900 duration-300  rounded-tr-2xl rounded-br-2xl h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl px-4 w-fit'>
                             <RiVipCrownLine />
                             <p>Premium Packages</p>
                         </div>
