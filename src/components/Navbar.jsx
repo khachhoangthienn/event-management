@@ -3,8 +3,7 @@ import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { IoMdArrowDropdown } from "react-icons/io";
 import { UserContext } from '@/context/UserContext';
-import { use } from 'react';
-
+import axiosPublic from '@/axiosConfig';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -17,6 +16,29 @@ const Navbar = () => {
             setInfo(savedUserInfo);
         }
     }, []);
+
+    const logOut = async () => {
+        try {
+            const authToken = localStorage.getItem("authToken");
+            console.log(authToken);
+            const response = await axiosPublic.post("/auth/logout", {
+                token: authToken,
+            });
+            if (response.status === 200) {
+                localStorage.removeItem("userInfo");
+                localStorage.removeItem("authToken");
+                setInfo(null);
+                navigate(`/login`);
+            }
+        } catch (error) {
+            if (error.response) {
+                const { code, message } = error.response.data;
+            } else {
+                console.error("Error:", error.message);
+                alert("Login failed: " + error.message);
+            }
+        }
+    };
 
     return (
         <div className='absolute top-0 left-0 w-full z-10 text-lg'>
@@ -46,8 +68,7 @@ const Navbar = () => {
                                 <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
                                     <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
                                         <p onClick={() => navigate(`profile`)} className='hover:text-black cursor-pointer'>My profile</p>
-                                        <p onClick={() => navigate(`my-appointments`)} className='hover:text-black cursor-pointer'>My appointment</p>
-                                        <p onClick={() => setToken(false)} className='hover:text-black cursor-pointer'>Logout</p>
+                                        <p onClick={() => logOut()} className='hover:text-black cursor-pointer'>Logout</p>
                                     </div>
                                 </div>
                             </div>

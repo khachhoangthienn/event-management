@@ -9,6 +9,7 @@ import MessagePopup from "./MessagePopup";
 import axiosInstance from "@/axiosConfig";
 
 const UserProfile = () => {
+
     const [isLoading, setIsLoading] = useState(true);
     const [isEditMode, setIsEditMode] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);

@@ -5,6 +5,7 @@ import axiosInstance from "@/axiosConfig";
 import { useContext, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { UserContext } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('')
@@ -13,6 +14,8 @@ const LoginForm = () => {
     const [isRegister, setIsRegister] = useState(false)
     const [registerState, setRegisterState] = useState('Attendee')
     const { setInfo } = useContext(UserContext);
+    const navigate = useNavigate();
+
 
 
     const getUserInfo = async (e) => {
@@ -23,6 +26,7 @@ const LoginForm = () => {
                 const result = await response.data.result;
                 localStorage.setItem("userInfo", JSON.stringify(result));
                 setInfo(result);
+                navigate("/");
             }
         } catch (error) {
             if (error.response) {

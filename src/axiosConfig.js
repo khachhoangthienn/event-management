@@ -1,6 +1,16 @@
 import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from "./context/UserContext";
 
 const axiosInstance = axios.create({
+  baseURL: "http://localhost:8080",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 10000,
+});
+
+const axiosPublic = axios.create({
   baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",
@@ -41,6 +51,8 @@ axiosInstance.interceptors.response.use(
       } catch (error) {
         localStorage.removeItem("authToken");
         localStorage.removeItem("userInfo");
+        const { setInfo } = useContext(UserContext); // Lấy setInfo từ context
+        setInfo(null); // Reset giá trị thông tin
         window.location.href = "/login";
       }
     }
