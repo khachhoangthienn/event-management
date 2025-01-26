@@ -11,9 +11,7 @@ import event8 from "./e8.jpg";
 import event9 from "./e9.jpg";
 import event10 from "./e10.jpg";
 import event11 from "./e11.jpg";
-export const assets = { BlackLogo, WhiteLogo };
-
-export const image = event1;
+export const assets = { BlackLogo, WhiteLogo, event1 };
 
 export const events = [
   {

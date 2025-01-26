@@ -9,6 +9,7 @@ import Login from './page/Login'
 import PricingPlan from './page/PricingPlan'
 import About from './page/About'
 import Contact from './page/Contact'
+import Profile from './page/Profile'
 const App = () => {
   return (
     <div>
@@ -21,6 +22,7 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<Contact />} />
+        <Route path='/profile' element={<Profile />} />
       </Routes>
       <Footer />
     </div>

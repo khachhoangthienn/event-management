@@ -9,7 +9,7 @@ import { IoMailOutline } from "react-icons/io5";
 
 const Contact = () => {
     return (
-        <>div
+        <div>
             <Header type='Contact' />
             <div className='flex flex-col container items-center gap-10 justify-center mx-auto text-cyan-900 py-14 px-6 md:px-20 lg:px-32 relative'>
                 <h1 className='text-5xl font-bold my-4 border-b-2 py-1'>CONTACT NOW</h1>
@@ -62,7 +62,7 @@ const Contact = () => {
                 </div>
                 <p className='text-2xl w-full'>Reach out to us – we're here to help you make every event unforgettable!</p>
             </div>
-        </>
+        </div>
     )
 }
 
