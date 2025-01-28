@@ -10,6 +10,7 @@ import PricingPlan from './page/PricingPlan'
 import About from './page/About'
 import Contact from './page/Contact'
 import Profile from './page/Profile'
+import { ToastContainer } from 'react-toastify'
 const App = () => {
   return (
     <div>
@@ -25,6 +26,7 @@ const App = () => {
         <Route path='/profile' element={<Profile />} />
       </Routes>
       <Footer />
+      <ToastContainer />
     </div>
   )
 }

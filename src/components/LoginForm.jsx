@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { UserContext } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('')
@@ -31,10 +32,10 @@ const LoginForm = () => {
         } catch (error) {
             if (error.response) {
                 const { code, message } = error.response.data;
-                alert("Login failed: " + message);
+                toast.error("Login failed: " + message);
             } else {
                 console.error("Error:", error.message);
-                alert("Login failed: " + error.message);
+                toast.error("Login failed: " + message);
             }
         }
     };
@@ -50,7 +51,9 @@ const LoginForm = () => {
                 const { token } = response.data.result;
                 localStorage.setItem("authToken", token);
                 getUserInfo(e);
-                alert("Login successful!");
+                toast.success("Login successful!", {
+                    autoClose: 3000,  // Thời gian tồn tại (5 giây)
+                });
             }
         } catch (error) {
             if (error.response) {

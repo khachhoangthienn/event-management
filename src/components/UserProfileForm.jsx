@@ -5,8 +5,8 @@ import {
     FaEnvelope, FaBirthdayCake, FaHome, FaTransgender,
     FaLock, FaEdit, FaSave, FaTimes
 } from "react-icons/fa";
-import MessagePopup from "./MessagePopup";
 import axiosInstance from "@/axiosConfig";
+import { toast } from "react-toastify";
 
 const UserProfile = () => {
 
@@ -19,8 +19,6 @@ const UserProfile = () => {
         newPassword: ''
     });
     const { info, setInfo } = useContext(UserContext);
-    const [showPopup, setShowPopup] = useState(false);
-
 
     useEffect(() => {
         if (!info) return;
@@ -46,7 +44,10 @@ const UserProfile = () => {
                 const result = await response.data.result;
                 localStorage.setItem("userInfo", JSON.stringify(result));
                 setInfo(result);
-                setShowPopup(true);
+                toast.success("Update information successfully!", {
+                    autoClose: 3000,
+                });
+                setIsEditMode(false);
             }
         } catch (error) {
             if (error.response) {
@@ -67,12 +68,6 @@ const UserProfile = () => {
             return;
         }
         updateUserInfo();
-    };
-
-    const handleClosePopup = () => {
-        setShowPopup(false);
-        setIsEditMode(false);
-
     };
 
     const cancelEdit = () => {
@@ -99,11 +94,9 @@ const UserProfile = () => {
         );
     }
 
-    console.log(editedInfo);
     return (
 
         <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 py-12 flex flex-col items-center">
-            {showPopup && <MessagePopup message="Update information successfully!" onClose={handleClosePopup} />}
             <div className="container mx-auto px-4 max-w-5xl">
                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                     {/* Header Section */}

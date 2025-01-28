@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp } from "react-icons/fi";
 import AttendeeDashboard from "./AttendeeDashboard";
 import FavoriteEvents from "./FavoriteEvents";
+import OrganizerDashboard from "./OrganizerDashboard";
 
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -36,7 +37,7 @@ const AttendeeHome = () => {
 
                 {/* Main Content */}
                 <div className="flex-1 max-w-5xl space-y-6">
-                    {activeMenu === "dashboard" && <AttendeeDashboard />}
+                    {activeMenu === "dashboard" && <OrganizerDashboard />}
                     {activeMenu === "favorites" && <FavoriteEvents />}
                 </div>
             </div>

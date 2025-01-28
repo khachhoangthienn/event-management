@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { IoMdArrowDropdown } from "react-icons/io";
 import { UserContext } from '@/context/UserContext';
 import axiosPublic from '@/axiosConfig';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Navbar = () => {
                 localStorage.removeItem("authToken");
                 setInfo(null);
                 navigate(`/login`);
+                toast.success("Logout successful!")
             }
         } catch (error) {
             if (error.response) {

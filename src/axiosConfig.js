@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useContext } from "react";
-import { UserContext } from "./context/UserContext";
+import { toast } from "react-toastify";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8080",
@@ -47,16 +46,26 @@ axiosInstance.interceptors.response.use(
         if (response.status === 200) {
           const newToken = await response.data.result.token;
           localStorage.setItem("authToken", newToken);
+
+          const originalRequest = error.config; // Lấy config của request ban đầu
+          originalRequest.headers["Authorization"] = `Bearer ${newToken}`; // Cập nhật lại header với token mới
+
+          // Gửi lại request ban đầu
+          return axiosInstance(originalRequest);
         }
       } catch (error) {
         localStorage.removeItem("authToken");
         localStorage.removeItem("userInfo");
-        const { setInfo } = useContext(UserContext); // Lấy setInfo từ context
-        setInfo(null); // Reset giá trị thông tin
-        window.location.href = "/login";
+        toast.error("Session expired. Please login again.", {
+          autoClose: 3000,
+          hideProgressBar: false,
+        });
+
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
       }
     }
-    return Promise.reject(error);
   }
 );
 
