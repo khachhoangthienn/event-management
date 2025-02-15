@@ -6,7 +6,7 @@ import { CiBoxList } from "react-icons/ci";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 
 
-const GridEvent = ({ title, events, categories, number, slice, col = 'auto' }) => {
+const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) => {
     const navigate = useNavigate()
     const [categorySelected, setCategorySelected] = useState("");
     const [showEvents, setShowEvents] = useState([])
@@ -29,7 +29,7 @@ const GridEvent = ({ title, events, categories, number, slice, col = 'auto' }) =
                     <p key={index} onClick={() => { categorySelected === category ? setCategorySelected("") : setCategorySelected(category) }}
                         className={`cursor-pointer px-4 py-2 rounded-md transition-all duration-300 ${categorySelected === category ? "border-2 border-cyan-900 text-cyan-900" : "hover:text-gray-400 border-2 border-white"}`}> {category}  </p>))}
             </div>
-            <div className={`w-full grid grid-cols-${col} gap-10 pt-5 gap-y-6 px-3 sm:px-0 text-gray-800`}>
+            <div className={`w-full grid grid-cols-3 gap-10 pt-5 gap-y-6 px-3 sm:px-0 text-gray-800`}>
                 {showEvents.slice(indexPage * number, indexPage * number + number).map((item, index) => (
                     <div onClick={() => navigate(`/events/${item.id}`)} className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500 relative group' key={index}>
                         <img className='bg-blue-50 w-full h-60' src={item.image} alt="" />

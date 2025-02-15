@@ -1,8 +1,7 @@
-import React, { useContext, useState } from "react";
-import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp } from "react-icons/fi";
-import AttendeeDashboard from "./AttendeeDashboard";
-import FavoriteEvents from "./FavoriteEvents";
+import React, { useState } from "react";
+import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp, FiCheckSquare } from "react-icons/fi";
 import OrganizerDashboard from "./OrganizerDashboard";
+import EventManagement from "./EventManagement";
 
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -16,8 +15,8 @@ const AttendeeHome = () => {
                         <h3 className="text-lg font-semibold text-cyan-900 mb-4">Navigation</h3>
                         {[
                             { id: "dashboard", icon: FiHome, label: "Dashboard" },
-                            { id: "favorites", icon: FiHeart, label: "Favorite Events" },
-                            { id: "tickets", icon: FiCreditCard, label: "My Tickets" },
+                            { id: "eventManagement", icon: FiCheckSquare, label: "Event Management" },
+                            { id: "tickets", icon: FiCreditCard, label: "Manage Event" },
                             { id: "notifications", icon: FiBell, label: "Notifications" },
                         ].map(({ id, icon: Icon, label }) => (
                             <button
@@ -38,7 +37,7 @@ const AttendeeHome = () => {
                 {/* Main Content */}
                 <div className="flex-1 max-w-5xl space-y-6">
                     {activeMenu === "dashboard" && <OrganizerDashboard />}
-                    {activeMenu === "favorites" && <FavoriteEvents />}
+                    {activeMenu === "eventManagement" && <EventManagement />}
                 </div>
             </div>
         </div>

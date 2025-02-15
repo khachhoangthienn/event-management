@@ -185,10 +185,11 @@ export const galleries = [
 ];
 
 export const categories = [
-  "Business",
-  "Fire Wall",
-  "Sport",
-  "Development",
-  "Marketing",
-  "Technology",
+  "Festival",
+  "Conference",
+  "Workshop",
+  "Webinar",
+  "Seminar",
+  "Networking",
+  "Exhibition",
 ];

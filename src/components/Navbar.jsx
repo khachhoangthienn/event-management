@@ -21,7 +21,6 @@ const Navbar = () => {
     const logOut = async () => {
         try {
             const authToken = localStorage.getItem("authToken");
-            console.log(authToken);
             const response = await axiosPublic.post("/auth/logout", {
                 token: authToken,
             });

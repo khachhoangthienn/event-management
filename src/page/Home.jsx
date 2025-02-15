@@ -12,13 +12,13 @@ const Home = () => {
     if (!info) return (<HomeLogin />)
     if (info.role == "ATTENDEE") return (
         <div>
-            <HeaderUser type={`Welcome to DazerEvent`} />
+            <HeaderUser type={`Attendee – Join exciting events!`} />
             <AttendeeHome />
         </div>
     )
     if (info.role == "ORGANIZER") return (
         <div>
-            <HeaderUser type={`Welcome to DazerEvent`} />
+            <HeaderUser type={`Organizer – Manage your events!`} />
             <OrganizerHome />
         </div>
     )

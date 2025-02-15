@@ -264,14 +264,18 @@ const UserProfile = () => {
                                                         <option value="true">Men</option>
                                                         <option value="false">Women</option>
                                                     </select>
-                                                ) : (
-                                                    <input
-                                                        type="text"
-                                                        name={name}
-                                                        value={editedInfo[name]}
-                                                        onChange={handleInputChange}
-                                                        className="w-full border-b-2 border-cyan-500 focus:outline-none"
-                                                    />
+                                                ) : (name !== 'email' ? (<input
+                                                    type="text"
+                                                    name={name}
+                                                    value={editedInfo[name]}
+                                                    onChange={handleInputChange}
+                                                    className="w-full border-b-2 border-cyan-500 focus:outline-none"
+                                                />) : (
+                                                    <p className="text-gray-600">
+                                                        {info[name]}
+                                                    </p>
+                                                )
+
                                                 )
                                             ) : (
                                                 <p className="text-gray-600">

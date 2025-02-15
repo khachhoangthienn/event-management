@@ -2,11 +2,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axiosInstance from "@/axiosConfig";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { UserContext } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { use } from "react";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('')
@@ -16,8 +17,6 @@ const LoginForm = () => {
     const [registerState, setRegisterState] = useState('Attendee')
     const { setInfo } = useContext(UserContext);
     const navigate = useNavigate();
-
-
 
     const getUserInfo = async (e) => {
         e.preventDefault();
@@ -32,10 +31,9 @@ const LoginForm = () => {
         } catch (error) {
             if (error.response) {
                 const { code, message } = error.response.data;
-                toast.error("Login failed: " + message);
+                toast.error("Can not get user information");
             } else {
-                console.error("Error:", error.message);
-                toast.error("Login failed: " + message);
+                toast.error("Can not get user information");
             }
         }
     };
@@ -56,13 +54,14 @@ const LoginForm = () => {
                 });
             }
         } catch (error) {
+            console.log("this is error code: " + error.response.data.code);
             if (error.response) {
-                const { code, message } = error.response.data;
-                if (code === 404) setMessage("No user found with this email.");
-                else if (code === 401) setMessage("Invalid password.");
+                const { code } = error.response.data;
+                if (code === 404) setMessage("No user found with this email");
+                else if (code === 401) setMessage("Invalid password");
             } else {
-                console.error("Error:", error.message);
-                alert("Login failed: " + error.message);
+                // console.error("Error:", error.message);
+                toast.error("Login failed " + message);
             }
         }
     };
@@ -73,7 +72,7 @@ const LoginForm = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-0 border border-gray-300 min-w-96 py-4 px-5 rounded-xl bg-white relative shadow-xl">
 
             <div className="flex flex-row gap-4 mx-4 text-4xl border-b border-gray-200 py-4 justify-center items-end font-semibold">
-                <h1 className=" text-cyan-900 transition-all duration-300">{isRegister ? `Sign Up ${registerState}` : 'Login Form'}</h1>
+                <h1 className=" text-cyan-900 transition-all duration-300">{isRegister ? `Sign Up ${registerState}` : 'Sign In'}</h1>
             </div>
 
             {isRegister && <div className="flex flex-row text-2xl text-white justify-center px-4 my-4">
@@ -95,7 +94,6 @@ const LoginForm = () => {
                 <div className="grid gap-2">
                     <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
-                        {!isRegister && <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">Forgot your password? </a>}
                     </div>
                     <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
                 </div>
@@ -111,24 +109,12 @@ const LoginForm = () => {
                     Sign Up
                 </Button> :
                     <div>
-                        <p className="text-red-700 py-2">{message}</p>
+                        <p className="text-red-700 pb-2">{message}</p>
                         <Button type="submit" className="w-full bg-cyan-900 text-white">
-                            Login
+                            Sign in
                         </Button>
                     </div>
                 }
-
-                {!isRegister && <div>
-                    <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                        <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                            Or continue with
-                        </span>
-                    </div>
-                    <Button variant="outline" className="w-full text-cyan-900 mt-4">
-                        <FaGoogle />
-                        Login with Google
-                    </Button>
-                </div>}
 
                 {
 
@@ -140,7 +126,7 @@ const LoginForm = () => {
                     </div> : <div className="text-center text-sm">
                         Have an account?{" "}
                         <a onClick={() => setIsRegister(false)} className="underline underline-offset-4 cursor-pointer">
-                            Login
+                            Sign in
                         </a>
                     </div>
                 }
