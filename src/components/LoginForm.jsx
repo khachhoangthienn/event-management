@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import axiosInstance from "@/axiosConfig";
+import { axiosInstance } from "@/axiosConfig";
 import { useContext, useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { UserContext } from "@/context/UserContext";

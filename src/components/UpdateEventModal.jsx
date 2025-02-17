@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import {
     FiPlus,
@@ -17,10 +17,24 @@ import { convertBase64ToFile } from "@/utils";
 import { LuLoaderCircle } from "react-icons/lu";
 
 
-const CreateEventForm = ({ onClose }) => {
+const UpdateEventForm = ({ onClose, currentEvent }) => {
     const { types } = useContext(EventContext);
     const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+
+
+    const [currentSpeaker, setCurrentSpeaker] = useState([]);
+    const [currentPhotos, setCurrentPhotos] = useState([]);
+
+    const [newSpeakerImagesFile, setNewSpeakerImagesFile] = useState([]);
+    const [newPhotoImagesFile, setNewPhotoImagesFile] = useState([]);
+    const [removeUrls, setRemoveUrls] = useState([]);
+    const [avatarSpeakers, setAvatarSpeakers] = useState([]);
+    const [eventImages, setEventImages] = useState([]);
+    const [tempBenefit, setTempBenefit] = useState('');
+    const [messageError, setMessageError] = useState('');
+    const [indexActivePackage, setIndexActivePackage] = useState(-1);
+
     const [formData, setFormData] = useState({
         // Basic Info
         eventName: '',
@@ -34,12 +48,36 @@ const CreateEventForm = ({ onClose }) => {
         speakers: [],
         packagePrices: [],
     });
-    const [avatarSpeakers, setAvatarSpeakers] = useState([]);
-    const [eventImages, setEventImages] = useState([]);
-    const [tempBenefit, setTempBenefit] = useState('');
-    const [messageError, setMessageError] = useState('');
-    const [indexActivePackage, setIndexActivePackage] = useState(-1);
 
+    useEffect(() => {
+        if (currentEvent) {
+            console.log("Current Event: ", currentEvent);
+            setFormData({
+                eventName: currentEvent.eventName,
+                eventDescription: currentEvent.eventDescription,
+                startTime: currentEvent.startTime,
+                endTime: currentEvent.endTime,
+                typesId: [currentEvent.types[0].typeId],
+                eventLocation: currentEvent.eventLocation,
+                speakers: currentEvent.speakers,
+                packagePrices: currentEvent.packagePrices.map((pkg) => ({
+                    packageName: pkg.packageName || '',
+                    packagePrice: pkg.packagePrice || 0,
+                    totalTickets: pkg.totalTickets || 0,
+                    benefits: pkg.benefits.map(benefit => benefit.benefitDescription)
+                }))
+            });
+        }
+        setCurrentSpeaker(currentEvent.speakers.map(speaker => ({
+            url: speaker.speakerImageUrl,
+            file: null
+        })));
+        setCurrentPhotos(currentEvent.photoEvents.map(photo => ({
+            url: photo.photoEventId,
+            file: null
+        })));
+
+    }, [currentEvent]);
 
 
     const submitImages = async (e, eventId) => {
@@ -76,20 +114,27 @@ const CreateEventForm = ({ onClose }) => {
 
     const submitData = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axiosInstance.post("/events", formData);
-            if (response.status === 200) {
-                const eventId = await response.data.result.eventId;
-                submitImages(e, eventId);
-            }
-        } catch (error) {
-            if (error.response) {
-                const { code, message } = error.response.data;
-                toast.error("Can not get user information");
-            } else {
-                toast.error("Can not get user information");
-            }
-        }
+
+        console.log("Current Event: ", formData);
+        console.log("Current Speaker: ", currentSpeaker);
+        console.log("Current Photos: ", currentPhotos);
+        console.log("Remove Urls: ", removeUrls);
+
+
+        // try {
+        //     const response = await axiosInstance.post("/events", formData);
+        //     if (response.status === 200) {
+        //         const eventId = await response.data.result.eventId;
+        //         submitImages(e, eventId);
+        //     }
+        // } catch (error) {
+        //     if (error.response) {
+        //         const { code, message } = error.response.data;
+        //         toast.error("Can not get user information");
+        //     } else {
+        //         toast.error("Can not get user information");
+        //     }
+        // }
     };
 
     // Basic Info handlers
@@ -102,15 +147,12 @@ const CreateEventForm = ({ onClose }) => {
     };
 
     const handleTypeChange = (event) => {
-        const selectedId = event.target.value;
-
-        setFormData((prev) => ({
+        setFormData(prev => ({
             ...prev,
-            typesId: prev.typesId.includes(selectedId)
-                ? prev.typesId.filter(id => id !== selectedId)  // Nếu đã có thì xóa đi (toggle)
-                : [...prev.typesId, selectedId] // Nếu chưa có thì thêm vào
+            typesId: [event.target.value],
         }));
     };
+
     // Speakers handlers
     const addSpeaker = () => {
         setFormData(prev => ({
@@ -118,11 +160,10 @@ const CreateEventForm = ({ onClose }) => {
             speakers: [...prev.speakers, { speakerName: '', speakerCareer: '' }]
         }));
 
-        setAvatarSpeakers(prev => [...prev, null]);
+        setCurrentSpeaker(prev => [...prev, { url: null, file: null }]);
     };
 
     const updateSpeaker = (index, field, value) => {
-        console.log(field);
         setFormData(prev => ({
             ...prev,
             speakers: prev.speakers.map((speaker, i) =>
@@ -132,18 +173,30 @@ const CreateEventForm = ({ onClose }) => {
         }));
 
         if (field === "speakerImage") {
-            setAvatarSpeakers(prev => prev.map((item, i) => (i === index ? value : item)));
+            if (currentSpeaker[index].url != null) {
+                setRemoveUrls(prev => [...prev, currentSpeaker[index].url]);
+            }
+            setCurrentSpeaker(prev =>
+                prev.map((item, i) => {
+                    if (i === index) {
+                        return { ...item, url: null, file: value };
+                    }
+                    return item;
+                })
+            );
         }
     };
 
     const removeSpeaker = (index) => {
-        console.log("delete");
+        if (currentSpeaker[index].url != null) {
+            setRemoveUrls(prev => [...prev, currentSpeaker[index].url]);
+        }
         setFormData(prev => ({
             ...prev,
-            speakers: prev.speakers.filter((_, i) => i !== index) // Xóa speaker theo index
+            speakers: prev.speakers.filter((_, i) => i !== index)
         }));
 
-        setAvatarSpeakers(prev => prev.filter((_, i) => i !== index)); // Xóa avatar theo index
+        setCurrentSpeaker(prev => prev.filter((_, i) => i !== index)); // Xóa avatar theo index
     };
 
     // Package handlers
@@ -176,12 +229,15 @@ const CreateEventForm = ({ onClose }) => {
     };
 
     // Photo handlers
-    const addPhoto = (url) => {
-        setEventImages(prev => [...prev, url]);
+    const addPhoto = (file) => {
+        setCurrentPhotos(prev => [...prev, { url: null, file: file }]);
     };
 
     const removePhoto = (index) => {
-        setEventImages(prev => prev.filter((_, i) => i !== index));
+        if (currentPhotos[index].url != null) {
+            setRemoveUrls(prev => [...prev, currentPhotos[index].url]);
+        }
+        setCurrentPhotos(prev => prev.filter((_, i) => i !== index));
     };
 
     const renderStep = () => {
@@ -218,7 +274,7 @@ const CreateEventForm = ({ onClose }) => {
                                 </label>
                                 <select
                                     name="eventType"
-                                    value={formData.eventType}
+                                    value={formData.typesId[0] || ""} // Giả sử typesId là mảng và bạn lấy phần tử đầu tiên
                                     onChange={handleTypeChange}
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-900 focus:border-cyan-900"
                                 >
@@ -229,6 +285,7 @@ const CreateEventForm = ({ onClose }) => {
                                         </option>
                                     ))}
                                 </select>
+
                             </div>
 
                             {/* Location */}
@@ -333,17 +390,21 @@ const CreateEventForm = ({ onClose }) => {
                                                 </label>
                                                 <div className="relative group">
                                                     <div className="w-3/4 aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                                                        {avatarSpeakers[index] ? (
-                                                            <img
-                                                                src={avatarSpeakers[index]}
-                                                                alt={speaker.speakerName || `Speaker ${index + 1}`}
-                                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                                            />
-                                                        ) : (
+                                                        {currentSpeaker[index].file == null && currentSpeaker[index].url == null && (
                                                             <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-300">
                                                                 <FiUpload className="w-8 h-8 text-gray-400" />
                                                             </div>
                                                         )}
+                                                        {currentSpeaker[index].file == null && currentSpeaker[index].url != null && (<img
+                                                            src={currentSpeaker[index].url}
+                                                            alt={speaker.speakerName || `Speaker ${index + 1}`}
+                                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                        />)}
+                                                        {currentSpeaker[index].file != null && currentSpeaker[index].url == null && (<img
+                                                            src={currentSpeaker[index].file}
+                                                            alt={speaker.speakerName || `Speaker ${index + 1}`}
+                                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                        />)}
                                                     </div>
                                                     <input
                                                         type="file"
@@ -583,10 +644,10 @@ const CreateEventForm = ({ onClose }) => {
                             Upload more photos to promote your event and capture unforgettable moments!
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {eventImages.map((photo, index) => (
+                            {currentPhotos.map((photo, index) => (
                                 <div key={index} className="relative group">
                                     <img
-                                        src={photo}
+                                        src={photo.url ? photo.url : photo.file}
                                         alt={`Event photo ${index + 1}`}
                                         className="w-full h-48 object-cover rounded-lg shadow-lg transition-transform duration-300 transform group-hover:scale-105"
                                     />
@@ -656,7 +717,9 @@ const CreateEventForm = ({ onClose }) => {
             }
             for (let i = 0; i < formData.speakers.length; i++) {
 
-                if (!formData.speakers[i].speakerName || !formData.speakers[i].speakerCareer || !avatarSpeakers[i]) {
+                if (!formData.speakers[i].speakerName ||
+                    !formData.speakers[i].speakerCareer ||
+                    (currentSpeaker[i].file == null && currentSpeaker[i].url == null)) {
                     console.log(formData.speakers);
                     setMessageError('Please fill all fields for speakers!');
                     return;
@@ -781,4 +844,4 @@ const CreateEventForm = ({ onClose }) => {
     );
 };
 
-export default CreateEventForm;
+export default UpdateEventForm;

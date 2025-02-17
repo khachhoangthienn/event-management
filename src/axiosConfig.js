@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",
@@ -9,7 +9,15 @@ const axiosInstance = axios.create({
   timeout: 10000,
 });
 
-const axiosPublic = axios.create({
+export const axiosPublicFormData = axios.create({
+  baseURL: "http://localhost:8080",
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+  timeout: 10000,
+});
+
+export const axiosPublic = axios.create({
   baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",
