@@ -11,13 +11,12 @@ import {
 } from 'react-icons/fi';
 import { toast } from "react-toastify";
 import { EventContext } from '@/context/EventContext';
-import axiosInstance from "@/axiosConfig";
-import { axiosPublicFormData } from "@/axiosConfig";
+import { axiosInstance, axiosPublic, axiosPublicFormData } from "@/axiosConfig";
 import { convertBase64ToFile } from "@/utils";
 import { LuLoaderCircle } from "react-icons/lu";
 
 
-const UpdateEventForm = ({ onClose, currentEvent }) => {
+const UpdateEventForm = ({ onClose, currentEvent, refreshEvent }) => {
     const { types } = useContext(EventContext);
     const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +25,7 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
     const [currentSpeaker, setCurrentSpeaker] = useState([]);
     const [currentPhotos, setCurrentPhotos] = useState([]);
 
-    const [newSpeakerImagesFile, setNewSpeakerImagesFile] = useState([]);
-    const [newPhotoImagesFile, setNewPhotoImagesFile] = useState([]);
     const [removeUrls, setRemoveUrls] = useState([]);
-    const [avatarSpeakers, setAvatarSpeakers] = useState([]);
-    const [eventImages, setEventImages] = useState([]);
     const [tempBenefit, setTempBenefit] = useState('');
     const [messageError, setMessageError] = useState('');
     const [indexActivePackage, setIndexActivePackage] = useState(-1);
@@ -51,7 +46,6 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
 
     useEffect(() => {
         if (currentEvent) {
-            console.log("Current Event: ", currentEvent);
             setFormData({
                 eventName: currentEvent.eventName,
                 eventDescription: currentEvent.eventDescription,
@@ -68,73 +62,95 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
                 }))
             });
         }
-        setCurrentSpeaker(currentEvent.speakers.map(speaker => ({
+        setCurrentSpeaker(currentEvent.speakers.map((speaker, index) => ({
             url: speaker.speakerImageUrl,
-            file: null
+            file: null,
+            index: index
         })));
-        setCurrentPhotos(currentEvent.photoEvents.map(photo => ({
+        setCurrentPhotos(currentEvent.photoEvents.map((photo, index) => ({
             url: photo.photoEventId,
-            file: null
+            file: null,
+            index: index
         })));
-
     }, [currentEvent]);
-
 
     const submitImages = async (e, eventId) => {
         e.preventDefault();
-        try {
-            const formDataToSend = new FormData();
+        console.log("current speaker", currentSpeaker);
+        const imagesSpeaker = currentSpeaker.filter(speaker => speaker.url != null)
+            .map(speaker => ({ index: speaker.index, url: speaker.url }));
+        const imagesEvent = currentPhotos.filter(photo => photo.url != null).map(photo => photo.url);
+        const removeImages = removeUrls;
+        const speakerFormdata = new FormData();
 
-            avatarSpeakers.forEach((base64, index) => {
-                const file = convertBase64ToFile(base64, `speaker_${index}.jpg`);
-                formDataToSend.append("speakerImages", file);
-            });
-            eventImages.forEach((base64, index) => {
-                const file = convertBase64ToFile(base64, `event_${index}.jpg`);
-                formDataToSend.append("eventImages", file);
-            });
+        currentSpeaker.forEach((speaker, index) => {
+            if (speaker.file) {
+                const file = convertBase64ToFile(speaker.file, `speaker_${index}.jpg`);
+                speakerFormdata.append("speakerImages", file);
+            }
+        });
+        const eventFormdata = new FormData();
+        currentPhotos.forEach((photo, index) => {
+            if (photo.file) {
+                const file = convertBase64ToFile(photo.file, `event_${index}.jpg`);
+                eventFormdata.append("eventImages", file);
+            }
+        });
+        const data = {
+            imagesSpeaker: imagesSpeaker,
+            urlsImagesEvent: imagesEvent,
+            removeUrls: removeImages,
+        }
+        try {
             setIsLoading(true);
-            const response = await axiosPublicFormData.post(`/events/${eventId}/upload-photo-events`, formDataToSend);
-            if (response.status === 200) {
-                toast.success("Event request sent to Admin successfully!");
-                setIsLoading(false);
-                onClose();
+
+            const updateUrls = await axiosPublic.put(`/events/${eventId}/update-urls`, data);
+
+
+            if (!speakerFormdata.entries().next().done) {
+                try {
+                    var updateImagesSpeaker = await axiosPublicFormData.put(`/events/${eventId}/update-file-speakers`, speakerFormdata);
+                    console.log("Updated Speaker images successfully!");
+                } catch (error) {
+                    toast.error(error, "Can not update speaker images");
+                    return;
+                }
             }
+
+            if (!eventFormdata.entries().next().done) {
+                try {
+                    var updateImagesEvent = await axiosPublicFormData.put(`/events/${eventId}/update-file-events`, eventFormdata);
+                    console.log("Updated Event images successfully!");
+                } catch (error) {
+                    console.log("error", error);
+                    toast.error(error, "Can not update event images");
+                    return;
+                }
+            }
+            toast.success("Update event successfully!");
+            refreshEvent();
+            onClose();
+            return;
         } catch (error) {
-            setIsLoading(false);
-            if (error.response) {
-                const { code, message } = error.response.data;
-                toast.error(message);
-                console.log("this is error code: " + code);
-            } else {
-                toast.error("Send event request failed");
-            }
+            toast.error(error, "Can not update event information");
         }
     }
 
     const submitData = async (e) => {
         e.preventDefault();
-
-        console.log("Current Event: ", formData);
-        console.log("Current Speaker: ", currentSpeaker);
-        console.log("Current Photos: ", currentPhotos);
-        console.log("Remove Urls: ", removeUrls);
-
-
-        // try {
-        //     const response = await axiosInstance.post("/events", formData);
-        //     if (response.status === 200) {
-        //         const eventId = await response.data.result.eventId;
-        //         submitImages(e, eventId);
-        //     }
-        // } catch (error) {
-        //     if (error.response) {
-        //         const { code, message } = error.response.data;
-        //         toast.error("Can not get user information");
-        //     } else {
-        //         toast.error("Can not get user information");
-        //     }
-        // }
+        try {
+            const response = await axiosPublic.put(`/events/${currentEvent.eventId}`, formData);
+            if (response.status === 200) {
+                submitImages(e, currentEvent.eventId);
+            }
+        } catch (error) {
+            if (error.response) {
+                const { code, message } = error.response.data;
+                toast.error("Can not get event information " + message);
+            } else {
+                toast.error("Can not get event information");
+            }
+        }
     };
 
     // Basic Info handlers
@@ -644,6 +660,7 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
                             Upload more photos to promote your event and capture unforgettable moments!
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {console.log("current photos", currentPhotos)}
                             {currentPhotos.map((photo, index) => (
                                 <div key={index} className="relative group">
                                     <img
@@ -652,6 +669,7 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
                                         className="w-full h-48 object-cover rounded-lg shadow-lg transition-transform duration-300 transform group-hover:scale-105"
                                     />
                                     <button
+                                        type='button'
                                         onClick={() => removePhoto(index)}
                                         className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
                                         aria-label="Remove photo"
@@ -688,9 +706,9 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
                                 />
                             </div>
                         </div>
-                        {eventImages.length > 0 && (
+                        {currentPhotos.length > 0 && (
                             <div className="mt-4 text-gray-600">
-                                <span>{eventImages.length} photo(s) uploaded</span>
+                                <span>{currentPhotos.length} photo(s) uploaded</span>
                             </div>
                         )}
                     </div>
@@ -720,7 +738,6 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
                 if (!formData.speakers[i].speakerName ||
                     !formData.speakers[i].speakerCareer ||
                     (currentSpeaker[i].file == null && currentSpeaker[i].url == null)) {
-                    console.log(formData.speakers);
                     setMessageError('Please fill all fields for speakers!');
                     return;
                 }
@@ -819,8 +836,11 @@ const UpdateEventForm = ({ onClose, currentEvent }) => {
                         type='button'
 
                         onClick={() => {
-                            console.log("Current Step:", currentStep);  // 👀 Kiểm tra giá trị
                             if (currentStep === 4) {
+                                if (currentPhotos.length === 0) {
+                                    setMessageError('Please upload at least one photo for the event!');
+                                    return;
+                                }
                                 handleSubmit(new Event('submit'));
                             } else {
                                 handleNextStep();

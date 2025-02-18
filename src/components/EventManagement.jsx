@@ -8,29 +8,38 @@ import { axiosInstance } from '@/axiosConfig';
 
 const EventManagement = () => {
     const { categories } = useContext(AppContext);
-    // const [selectedEvent, setSelectedEvent] = useState(null);
     const [myEvents, setMyEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
-    useEffect(() => {
-        const getMyEvents = async () => {
-            try {
-                const response = await axiosInstance.get(`/events/context-user-events`);
-                if (response.status === 200) {
+    const getMyEvents = async () => {
+        try {
+            const response = await axiosInstance.get(`/events/context-user-events`);
+            if (response.status === 200) {
+
+                if (Array.isArray(response.data.result)) {
                     setMyEvents(response.data.result);
-                }
-            } catch (error) {
-                if (error.response) {
-                    const { code, message } = error.response.data;
-                    toast.error(message);
-                    console.log("this is error code: " + code);
                 } else {
-                    toast.error("get events failed");
+                    setMyEvents([response.data.result]);
+                }
+                if (selectedEvent !== null) {
+                    console.log("oke!");
+                    setSelectedEvent(myEvents.find(event => event.eventId === selectedEvent.eventId));
                 }
             }
-        };
+        } catch (error) {
+            if (error.response) {
+                const { code, message } = error.response.data;
+                toast.error(message);
+                console.log("this is error code: " + code);
+            } else {
+                toast.error("Lấy sự kiện thất bại");
+            }
+        }
+    };
+
+    useEffect(() => {
         getMyEvents();
-    }, [])
+    }, []);
 
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -153,6 +162,7 @@ const EventManagement = () => {
                     <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                         <CreateEventForm
                             onClose={() => setIsCreateModalOpen(false)}
+                            refreshEvent={getMyEvents}
                         />
                     </div>
                 </div>
@@ -162,6 +172,7 @@ const EventManagement = () => {
                     <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                         <UpdateEventForm
                             onClose={() => setUpdateModalOpen(false)}
+                            refreshEvent={getMyEvents}
                             currentEvent={selectedEvent}
                         />
                     </div>

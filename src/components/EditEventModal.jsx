@@ -17,7 +17,7 @@ import { convertBase64ToFile } from "@/utils";
 import { LuLoaderCircle } from "react-icons/lu";
 
 
-const CreateEventForm = ({ onClose }) => {
+const CreateEventForm = ({ onClose, refreshEvent }) => {
     const { types } = useContext(EventContext);
     const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +60,7 @@ const CreateEventForm = ({ onClose }) => {
             if (response.status === 200) {
                 toast.success("Event request sent to Admin successfully!");
                 setIsLoading(false);
+                refreshEvent();
                 onClose();
             }
         } catch (error) {
@@ -686,6 +687,7 @@ const CreateEventForm = ({ onClose }) => {
                 packageNames.add(formData.packagePrices[i].packageName);
             }
         }
+
         setMessageError('');
         setCurrentStep(prev => prev + 1);
     };
@@ -758,6 +760,10 @@ const CreateEventForm = ({ onClose }) => {
                         onClick={() => {
                             console.log("Current Step:", currentStep);  // 👀 Kiểm tra giá trị
                             if (currentStep === 4) {
+                                if (eventImages.length === 0) {
+                                    setMessageError('Please upload at least one photo for the event!');
+                                    return;
+                                }
                                 handleSubmit(new Event('submit'));
                             } else {
                                 handleNextStep();
