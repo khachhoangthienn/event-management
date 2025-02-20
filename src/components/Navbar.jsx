@@ -3,18 +3,18 @@ import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { IoMdArrowDropdown } from "react-icons/io";
 import { UserContext } from '@/context/UserContext';
-import axiosPublic from '@/axiosConfig';
+import { axiosPublic, axiosInstance } from '@/axiosConfig';
 import { toast } from 'react-toastify';
+
 
 const Navbar = () => {
     const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState(false);
-    const { info, setInfo } = useContext(UserContext);
+    const { info, setInfo, getUserInfo } = useContext(UserContext);
 
     useEffect(() => {
-        const savedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
-        if (savedUserInfo) {
-            setInfo(savedUserInfo);
+        if (localStorage.getItem("authToken")) {
+            getUserInfo();
         }
     }, []);
 

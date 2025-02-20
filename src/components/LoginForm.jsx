@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { axiosInstance } from "@/axiosConfig";
+import { axiosInstance, axiosPublic } from "@/axiosConfig";
 import { useContext, useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { UserContext } from "@/context/UserContext";
@@ -12,33 +12,25 @@ import { use } from "react";
 const LoginForm = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
     const [isRegister, setIsRegister] = useState(false)
     const [registerState, setRegisterState] = useState('Attendee')
-    const { setInfo } = useContext(UserContext);
+    const { setInfo, info, getUserInfo } = useContext(UserContext);
     const navigate = useNavigate();
 
-    const getUserInfo = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axiosInstance.get("/users/me");
-            if (response.status === 200) {
-                const result = await response.data.result;
-                localStorage.setItem("userInfo", JSON.stringify(result));
-                setInfo(result);
-                navigate("/");
-            }
-        } catch (error) {
-            if (error.response) {
-                const { code, message } = error.response.data;
-                toast.error("Can not get user information");
-            } else {
-                toast.error("Can not get user information");
-            }
-        }
-    };
-
     const handleSubmit = async (e) => {
+
+        e.preventDefault();
+        if (isRegister) {
+            handleRegister(e);
+        } else {
+            handleLogin(e);
+        }
+    }
+
+
+    const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const response = await axiosInstance.post("/auth/login", {
@@ -48,9 +40,11 @@ const LoginForm = () => {
             if (response.status === 200) {
                 const { token } = response.data.result;
                 localStorage.setItem("authToken", token);
-                getUserInfo(e);
+                const result = await getUserInfo();
+                if (result.firstName == null || result.lastName == null) navigate("/profile");
+                else navigate("/");
                 toast.success("Login successful!", {
-                    autoClose: 3000,  // Thời gian tồn tại (5 giây)
+                    autoClose: 3000,
                 });
             }
         } catch (error) {
@@ -62,6 +56,37 @@ const LoginForm = () => {
             } else {
                 // console.error("Error:", error.message);
                 toast.error("Login failed " + message);
+            }
+        }
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        try {
+            console.log("password", password);
+            console.log("confirmPassword", confirmPassword);
+            const response = await axiosPublic.post("/users", {
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword,
+                role: registerState.toUpperCase()
+            });
+            if (response.status === 200) {
+                const { token } = response.data.result;
+                location.reload();
+                toast.success("Registration successful!", {
+                    autoClose: 3000,
+                });
+            }
+        } catch (error) {
+            console.log("this is error code: " + error.response.data.code);
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 409) setMessage("Email already exists! Please try another email");
+                else if (code === 400) setMessage("Password does not match! Please try again");
+            } else {
+                // console.error("Error:", error.message);
+                toast.error("Registration failed " + message);
             }
         }
     };
@@ -98,16 +123,22 @@ const LoginForm = () => {
                     <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
                 </div>
 
-                {isRegister && <div className="grid gap-2">
-                    <div className="flex items-center">
-                        <Label htmlFor="password">Type password again</Label>
+                {isRegister && <div>
+                    <div className="grid gap-2">
+                        <div className="flex items-center">
+                            <Label htmlFor="password">Type password again</Label>
+                        </div>
+                        <Input id="password" type="password" required onChange={(e) => setConfirmPassword(e.target.value)} />
                     </div>
-                    <Input id="password" type="password" required />
+
                 </div>}
 
-                {isRegister ? <Button type="submit" className="w-full bg-cyan-900 text-white">
-                    Sign Up
-                </Button> :
+                {isRegister ? <div>
+                    <p className="text-red-700 pb-2">{message}</p>
+                    <Button type="submit" className="w-full bg-cyan-900 text-white">
+                        Sign Up
+                    </Button>
+                </div> :
                     <div>
                         <p className="text-red-700 pb-2">{message}</p>
                         <Button type="submit" className="w-full bg-cyan-900 text-white">
@@ -120,12 +151,18 @@ const LoginForm = () => {
 
                     !isRegister ? <div className="text-center text-sm">
                         Don&apos;t have an account?{" "}
-                        <a onClick={() => setIsRegister(true)} className="underline underline-offset-4 cursor-pointer">
+                        <a onClick={() => {
+                            setIsRegister(true);
+                            setMessage("");
+                        }} className="underline underline-offset-4 cursor-pointer">
                             Sign up
                         </a>
                     </div> : <div className="text-center text-sm">
                         Have an account?{" "}
-                        <a onClick={() => setIsRegister(false)} className="underline underline-offset-4 cursor-pointer">
+                        <a onClick={() => {
+                            setIsRegister(false);
+                            setMessage("");
+                        }} className="underline underline-offset-4 cursor-pointer">
                             Sign in
                         </a>
                     </div>

@@ -10,10 +10,13 @@ const EventManagement = () => {
     const { categories } = useContext(AppContext);
     const [myEvents, setMyEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('all');
+    const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
 
     const getMyEvents = async () => {
         try {
-            const response = await axiosInstance.get(`/events/context-user-events`);
+            const response = await axiosInstance.get(`/events/context-user-events?typeFilter=${activeTab}`);
             if (response.status === 200) {
 
                 if (Array.isArray(response.data.result)) {
@@ -39,12 +42,7 @@ const EventManagement = () => {
 
     useEffect(() => {
         getMyEvents();
-    }, []);
-
-
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('all');
-    const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
+    }, [activeTab]);
 
 
     const tabs = [
@@ -120,7 +118,7 @@ const EventManagement = () => {
                             <div className="flex items-center gap-4 text-gray-600">
                                 <span className="flex items-center gap-1">
                                     <FiCalendar className="text-cyan-900" />
-                                    {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                                    {new Date(event.startTime).toLocaleDateString()} - {new Date(event.endTime).toLocaleDateString()}
                                 </span>
                             </div>
 

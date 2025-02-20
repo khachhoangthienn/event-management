@@ -22,7 +22,7 @@ const AttendeeDashboard = () => {
                     <div className="absolute inset-0 bg-pattern opacity-10"></div>
                     <div className="relative z-10 max-w-2xl">
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                            Welcome back, {info.firstName} {info.lastName}!
+                            Welcome back, {info.firstName ? (info.firstName + " " + info.lastName) : ("New User")}!
                         </h1>
                         <p className="text-cyan-100 text-lg mb-6">
                             Stay updated with your upcoming events and latest notifications.

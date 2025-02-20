@@ -6,7 +6,10 @@ import {
     FaLock, FaEdit, FaSave, FaTimes
 } from "react-icons/fa";
 import axiosInstance from "@/axiosConfig";
+import { formDataInstance } from "@/axiosConfig";
 import { toast } from "react-toastify";
+import { LuLoaderCircle } from "react-icons/lu";
+
 
 const UserProfile = () => {
 
@@ -14,6 +17,7 @@ const UserProfile = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [editedInfo, setEditedInfo] = useState(null);
+    const [isAvatarLoading, setIsAvatarLoading] = useState(false);
     const [passwordData, setPasswordData] = useState({
         oldPassword: '',
         newPassword: ''
@@ -24,6 +28,12 @@ const UserProfile = () => {
         if (!info) return;
         setEditedInfo({ ...info });
         setIsLoading(false);
+
+        if (info.firstName == null ||
+            info.lastName == null ||
+            info.email == null ||
+            info.birth == null) setIsEditMode(true);
+
     }, [info]);
 
 
@@ -36,13 +46,13 @@ const UserProfile = () => {
     };
 
     const updateUserInfo = async () => {
+        console.log("update")
         try {
             const response = await axiosInstance.put("/users/me", {
                 ...editedInfo,
             });
             if (response.status === 200) {
                 const result = await response.data.result;
-                localStorage.setItem("userInfo", JSON.stringify(result));
                 setInfo(result);
                 toast.success("Update information successfully!", {
                     autoClose: 3000,
@@ -57,9 +67,41 @@ const UserProfile = () => {
                 alert("Login failed: " + error.message);
             }
         }
+
     };
 
-    const saveChanges = () => {
+
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append("image", file);
+        try {
+            setIsAvatarLoading(true);
+            const response = await formDataInstance.post("/users/upload-avatar", formData);
+            if (response.status === 200) {
+                const result = await response.data.result;
+                setInfo(result);
+                toast.success("Update avatar successfully!", {
+                    autoClose: 3000,
+                });
+                setIsEditMode(false);
+            }
+        } catch (error) {
+            if (error.response) {
+                const { code, message } = error.response.data;
+            } else {
+                console.error("Error:", error.message);
+                alert("Login failed: " + error.message);
+            }
+        } finally {
+            setIsAvatarLoading(false);
+        }
+    }
+
+    const saveChanges = (e) => {
+        e.preventDefault();
+        console.log(e.nativeEvent.submitter.id);
+        if (e.nativeEvent.submitter.id !== 'save-btn') return;
         if (editedInfo.firstName === ''
             || editedInfo.lastName === ''
             || editedInfo.bio === '' ||
@@ -82,6 +124,8 @@ const UserProfile = () => {
         setPasswordData({ oldPassword: '', newPassword: '' });
     };
 
+
+
     if (isLoading || !editedInfo) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 flex items-center justify-center">
@@ -95,9 +139,9 @@ const UserProfile = () => {
     }
 
     return (
-
         <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 py-12 flex flex-col items-center">
-            <div className="container mx-auto px-4 max-w-5xl">
+            {info.firstName == null && <span className="text-2xl text-red-500">Please update your profile to unlock all features.</span>}
+            <form onSubmit={saveChanges} className="container mx-auto px-4 max-w-5xl">
                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                     {/* Header Section */}
                     <div className="bg-gradient-to-r from-cyan-900 to-cyan-400 text-white p-8 text-center relative">
@@ -111,7 +155,9 @@ const UserProfile = () => {
                                         <FaTimes />
                                     </button>
                                     <button
-                                        onClick={saveChanges}
+                                        id="save-btn"
+                                        type="submit"
+                                        // onClick={saveChanges}
                                         className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
                                     >
                                         <FaSave />
@@ -120,51 +166,67 @@ const UserProfile = () => {
                             ) : (
                                 <>
                                     <button
+                                        type='button'
                                         onClick={() => setIsEditMode(true)}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
+                                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center cursor-pointer"
                                     >
                                         <FaEdit className="mr-2" /> Edit Profile
                                     </button>
-                                    <button
+                                    {/* <button
                                         onClick={() => setIsPasswordModalOpen(true)}
                                         className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center"
                                     >
                                         <FaLock className="mr-2" /> Change Password
-                                    </button>
+                                    </button> */}
                                 </>
                             )}
                         </div>
 
                         <div className="text-center">
-                            <img
-                                src={info.avatarUrl || "https://images.unsplash.com/photo-1633332755192-727a05c4013d"}
-                                alt="Profile"
-                                className="w-52 h-52 rounded-full mx-auto object-cover border-4 border-white shadow-lg mb-4"
-                                onError={(e) => {
-                                    e.target.src = "https://images.unsplash.com/photo-1633332755192-727a05c4013d";
-                                }}
-                            />
+                            <div className="w-full text-center relative my-6">
+                                <LuLoaderCircle className={`animate-spin text-4xl ${isAvatarLoading ? "opacity-100" : "opacity-0"}`} />
+                                <img
+                                    src={info.avatarUrl || "https://images.unsplash.com/photo-1633332755192-727a05c4013d"}
+                                    alt="Profile"
+                                    className="w-52 h-52 rounded-full mx-auto object-cover border-4 border-white shadow-lg mb-4 cursor-pointer"
+                                    onClick={() => document.getElementById('avatar-upload').click()}
+                                    onError={(e) => {
+                                        e.target.src = "https://images.unsplash.com/photo-1633332755192-727a05c4013d";
+                                    }}
+                                />
+                                <input
+                                    id="avatar-upload"
+                                    type="file"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                />
+                            </div>
                             {isEditMode ? (
                                 <div className="flex flex-row justify-center items-center gap-4">
                                     <input
+                                        required
                                         type="text"
+                                        placeholder="First Name"
                                         name="firstName"
-                                        value={editedInfo.firstName}
+                                        value={editedInfo.firstName ? editedInfo.firstName : ''}
                                         onChange={handleInputChange}
-                                        className="text-4xl font-bold text-center bg-transparent border-b-2 border-white text-white mb-2 w-1/4"
-                                    />
+                                        className="text-4xl font-bold text-center bg-transparent border-b-2 border-white text-white mb-2 w-1/4 
+                                        placeholder-white placeholder-opacity-50 focus:placeholder-opacity-0 transition-opacity duration-300"                                    />
                                     <input
+                                        required
                                         type="text"
+                                        placeholder="Last Name"
                                         name="lastName"
-                                        value={editedInfo.lastName}
+                                        value={editedInfo.lastName ? editedInfo.lastName : ''}
                                         onChange={handleInputChange}
-                                        className="text-4xl font-bold text-center bg-transparent border-b-2 border-white text-white mb-2 w-1/4"
-                                    />
+                                        className="text-4xl font-bold text-center bg-transparent border-b-2 border-white text-white mb-2 w-1/4 
+                                        placeholder-white placeholder-opacity-50 focus:placeholder-opacity-0 transition-opacity duration-300"                                    />
 
                                 </div>
                             ) : (
                                 <>
-                                    <h1 className="text-4xl font-bold">{info.firstName} {info.lastName}</h1>
+                                    <h1 className="text-4xl font-bold">{info.firstName ? info.firstName : ""} {info.lastName ? info.lastName : ""}</h1>
                                 </>
                             )}
                             <h2 className="text-xl opacity-80 mt-2">{info.role}</h2>
@@ -198,8 +260,9 @@ const UserProfile = () => {
                                 <h3 className="text-2xl font-semibold text-cyan-800 mb-4">About Me</h3>
                                 {isEditMode ? (
                                     <textarea
+                                        placeholder="Tell us about yourself"
                                         name="bio"
-                                        value={editedInfo.bio}
+                                        value={editedInfo.bio ? editedInfo.bio : ''}
                                         onChange={handleInputChange}
                                         className="w-full p-2 border rounded-lg text-gray-600 italic"
                                         rows="4"
@@ -265,9 +328,11 @@ const UserProfile = () => {
                                                         <option value="false">Women</option>
                                                     </select>
                                                 ) : (name !== 'email' ? (<input
+                                                    required
                                                     type="text"
+                                                    placeholder={name === 'birth' ? 'YYYY-MM-DD' : 'Enter your address (e.g., 123 Main Street, New York)'}
                                                     name={name}
-                                                    value={editedInfo[name]}
+                                                    value={editedInfo[name] ? editedInfo[name] : ''}
                                                     onChange={handleInputChange}
                                                     className="w-full border-b-2 border-cyan-500 focus:outline-none"
                                                 />) : (
@@ -293,7 +358,7 @@ const UserProfile = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
 
             {/* Password Change Modal */}
             {isPasswordModalOpen && (
@@ -307,7 +372,7 @@ const UserProfile = () => {
                                 </div>
                                 <input
                                     type="password"
-                                    placeholder="Old Password"
+                                    placeholder="old Password"
                                     value={passwordData.oldPassword}
                                     onChange={(e) => setPasswordData(prev => ({
                                         ...prev,
