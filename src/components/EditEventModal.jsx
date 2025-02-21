@@ -185,6 +185,7 @@ const CreateEventForm = ({ onClose, refreshEvent }) => {
         setEventImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    console.log(types);
     const renderStep = () => {
         switch (currentStep) {
             case 1:

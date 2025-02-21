@@ -4,53 +4,68 @@ import { MdOutlineShareLocation } from "react-icons/md";
 import { MdEventNote } from "react-icons/md";
 import { CiBoxList } from "react-icons/ci";
 import { FaArrowAltCircleRight } from "react-icons/fa";
-
+import { datimeToEnUS } from '@/utils'
 
 const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) => {
     const navigate = useNavigate()
     const [categorySelected, setCategorySelected] = useState("");
     const [showEvents, setShowEvents] = useState([])
+    const [showCategories, setShowCategories] = useState([])
     const [indexPage, setindexPage] = useState(0)
+    useEffect(() => {
+        if (categories) {
+            setShowCategories(categories)
+        } else {
+            setShowCategories([])
+        }
+        if (events) {
+            setShowEvents(events)
+        }
+    }, [events])
 
     useEffect(() => {
         if (categorySelected) {
-            setShowEvents(events.filter(event => event.category === categorySelected))
+            setShowEvents(events.filter(event => event.types[0].typeId === categorySelected))
         } else {
             setShowEvents(events)
         }
         setindexPage(0)
     }, [events, categorySelected])
 
+    if (!showEvents) return <div>Loading...</div>
     return (
         <div className='flex flex-col container items-center gap-4 justify-start mx-auto py-10 px-6 md:px-20 lg:px-32'>
             <h1 className='text-5xl font-bold text-cyan-900' id='nav-event'>{title}</h1>
             <div className='flex flex-row gap-4 items-start w-full text-lg mt-2 py-1'>
                 {categories && categories.map((category, index) => (
-                    <p key={index} onClick={() => { categorySelected === category ? setCategorySelected("") : setCategorySelected(category) }}
-                        className={`cursor-pointer px-4 py-2 rounded-md transition-all duration-300 ${categorySelected === category ? "border-2 border-cyan-900 text-cyan-900" : "hover:text-gray-400 border-2 border-white"}`}> {category}  </p>))}
+                    <p key={index} onClick={() => { categorySelected === category.typeId ? setCategorySelected("") : setCategorySelected(category.typeId) }}
+                        className={`cursor-pointer px-4 py-2 rounded-md transition-all duration-300 ${categorySelected === category.typeId ? "border-2 border-cyan-900 text-cyan-900" : "hover:text-gray-400 border-2 border-white"}`}>
+                        {category.typeName}
+                    </p>
+                ))}
             </div>
-            <div className={`w-full grid grid-cols-3 gap-10 pt-5 gap-y-6 px-3 sm:px-0 text-gray-800`}>
+            <div className={`w-full grid grid-cols-3 gap-10 pt-5 gap-y-6 px-3 sm:px-0 text-gray-800 min-h-[50vh]`}>
                 {showEvents.slice(indexPage * number, indexPage * number + number).map((item, index) => (
-                    <div onClick={() => navigate(`/events/${item.id}`)} className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500 relative group' key={index}>
-                        <img className='bg-blue-50 w-full h-60' src={item.image} alt="" />
-                        <div className={`absolute bg-cyan-950 text-white font-semibold ${item.availables !== item.seats ? "group-hover:bg-white group-hover:text-cyan-900" : "bg-red-800 text-white"}  w-60 h-12 top-44 transition-all duration-300 flex items-center justify-center text-lg gap-2`}>
+                    <div onClick={() => navigate(`/events/${item.eventId}`)} className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500 relative group' key={index}>
+                        <img className='bg-blue-50 w-full h-60' src={item.photoEvents[0].photoEventId} alt="" />
+                        <div className={`absolute bg-cyan-950 text-white font-semibold ${item.availableTickets !== 0 ? "group-hover:bg-white group-hover:text-cyan-900" : "bg-red-800 text-white"}  w-60 h-12 top-44 transition-all duration-300 flex items-center justify-center text-lg gap-2`}>
                             <CiBoxList />
-                            <p>{item.availables}/{item.seats} seats</p>
+                            <p>{item.availableTickets}/{item.totalTickets} seats</p>
                         </div>
                         <div className='p-4'>
                             {/* calender and location */}
                             <div className='flex justify-between py-1 text-sm '>
                                 <div className='flex gap-2 items-center'>
                                     <MdEventNote className='text-cyan-900' />
-                                    <p>{item.calender}</p>
+                                    <p>{datimeToEnUS(item.startTime)}</p>
                                 </div>
                                 <div className='flex gap-2 items-center'>
                                     <MdOutlineShareLocation className='text-cyan-900' />
-                                    <p>{item.location}</p>
+                                    <p>{item.eventLocation}</p>
                                 </div>
                             </div>
-                            <p className='text-sm'>Category: {item.category}</p>
-                            <p className='text-gray-800 text-2xl font-medium'>{item.name}</p>
+                            <p className='text-sm'>Category: {item.types[0].typeName}</p>
+                            <p className='text-cyan-900 text-2xl font-medium pt-2'>{item.eventName}</p>
                         </div>
                     </div>
                 ))}

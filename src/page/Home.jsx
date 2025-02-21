@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import HeaderUser from '@/components/headerUser';
 import AttendeeHome from '@/components/attendeeHome';
 import OrganizerHome from '@/components/organizerHome';
+import AdminHome from '@/components/adminHome';
 
 const Home = () => {
     const { info } = useContext(UserContext);
@@ -20,6 +21,12 @@ const Home = () => {
         <div>
             <HeaderUser type={`Organizer – Manage your events!`} />
             <OrganizerHome />
+        </div>
+    )
+    if (info.role == "ADMIN") return (
+        <div>
+            <HeaderUser type={`Admin – Manage the platform!`} />
+            <AdminHome />
         </div>
     )
 }

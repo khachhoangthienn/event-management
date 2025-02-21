@@ -6,7 +6,7 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 20000,
 });
 
 export const axiosPublicFormData = axios.create({
@@ -14,7 +14,7 @@ export const axiosPublicFormData = axios.create({
   headers: {
     "Content-Type": "multipart/form-data",
   },
-  timeout: 10000,
+  timeout: 20000,
 });
 
 export const axiosPublic = axios.create({
@@ -22,7 +22,7 @@ export const axiosPublic = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 20000,
 });
 
 export const formDataInstance = axios.create({
@@ -30,7 +30,7 @@ export const formDataInstance = axios.create({
   headers: {
     "Content-Type": "multipart/form-data",
   },
-  timeout: 10000,
+  timeout: 20000,
 });
 
 axiosInstance.interceptors.request.use(

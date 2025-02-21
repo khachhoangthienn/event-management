@@ -13,21 +13,25 @@ const EventManagement = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('all');
     const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const eventsPerPage = 4;
+    const indexOfLastEvent = currentPage * eventsPerPage;
+    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+    const currentEvents = myEvents.slice(indexOfFirstEvent, indexOfLastEvent);
 
     const getMyEvents = async () => {
         try {
             const response = await axiosInstance.get(`/events/context-user-events?typeFilter=${activeTab}`);
             if (response.status === 200) {
+                const events = Array.isArray(response.data.result) ? response.data.result : [response.data.result];
+                setMyEvents(events);
 
-                if (Array.isArray(response.data.result)) {
-                    setMyEvents(response.data.result);
-                } else {
-                    setMyEvents([response.data.result]);
-                }
-                if (selectedEvent !== null) {
-                    console.log("oke!");
-                    setSelectedEvent(myEvents.find(event => event.eventId === selectedEvent.eventId));
-                }
+                setTimeout(() => {
+                    if (selectedEvent) {
+                        const foundEvent = events.find(event => event.eventId === selectedEvent.eventId);
+                        setSelectedEvent(foundEvent || null);
+                    }
+                }, 0);
             }
         } catch (error) {
             if (error.response) {
@@ -35,6 +39,7 @@ const EventManagement = () => {
                 toast.error(message);
                 console.log("this is error code: " + code);
             } else {
+                console.error("Error:", error.message);
                 toast.error("Lấy sự kiện thất bại");
             }
         }
@@ -47,9 +52,9 @@ const EventManagement = () => {
 
     const tabs = [
         { id: 'all', label: 'All Events' },
-        { id: 'upcoming', label: 'Upcoming' },
-        { id: 'ongoing', label: 'Ongoing' },
-        { id: 'completed', label: 'Completed' }
+        { id: 'PENDING', label: 'Pending' },
+        { id: 'APPROVED', label: 'Approved' },
+        { id: 'REJECTED', label: 'Rejected' }
     ];
 
     if (!myEvents) return (<div></div>);
@@ -84,8 +89,8 @@ const EventManagement = () => {
             </div>
 
             {/* Events List */}
-            <div className="space-y-4">
-                {myEvents.map((event) => (
+            <div className="space-y-4 min-h-[80vh]">
+                {currentEvents.map((event) => (
                     <div
                         key={event.eventId}
                         className="bg-white rounded-xl shadow-md border border-cyan-100 p-4 flex items-center gap-4"
@@ -103,7 +108,7 @@ const EventManagement = () => {
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xl font-semibold text-cyan-900">{event.eventName}</h3>
                                 <span
-                                    className={`px-3 py-1 text-sm font-medium rounded-full ${event.eventStatus === "Active"
+                                    className={`px-3 py-1 text-sm font-medium rounded-full ${event.eventStatus === "APPROVED"
                                         ? "bg-green-100 text-green-700"
                                         : event.eventStatus === "PENDING"
                                             ? "bg-yellow-100 text-yellow-700"
@@ -142,6 +147,10 @@ const EventManagement = () => {
                         {/* Nút thao tác */}
                         <div className="flex flex-col items-center gap-2">
                             <button className="p-2 text-cyan-900 hover:bg-cyan-50 rounded-lg" onClick={() => {
+                                if (event.eventStatus == "APPROVED") {
+                                    toast.error("Cannot update this event");
+                                    return;
+                                }
                                 setSelectedEvent(event);
                                 setUpdateModalOpen(true);
                             }}>
@@ -153,6 +162,26 @@ const EventManagement = () => {
                         </div>
                     </div>
                 ))}
+
+            </div>
+            <div className="flex justify-center mt-4 space-x-2">
+                <button
+                    className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </button>
+
+                <span className="px-4 py-2">{currentPage}</span>
+
+                <button
+                    className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={indexOfLastEvent >= myEvents.length}
+                >
+                    Next
+                </button>
             </div>
 
             {isCreateModalOpen && (
