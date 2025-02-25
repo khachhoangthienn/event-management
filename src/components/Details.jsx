@@ -16,12 +16,14 @@ import { IoMdSend } from "react-icons/io";
 
 import ReactStars from "react-stars";
 import { Button } from './ui/button';
-
+import axiosInstance, { axiosPublic } from '@/axiosConfig';
+import { datimeToEnUS } from '@/utils';
+import { UserContext } from '@/context/UserContext';
 
 const Details = () => {
     const { eventId } = useParams();
+    const { info } = useContext(UserContext);
     const navigate = useNavigate()
-    const { events, galleries } = useContext(AppContext)
     // Information of event
     const [eventInfo, setEventInfo] = useState(null)
     // Picture here 
@@ -37,20 +39,86 @@ const Details = () => {
     // favourite
     const [isFavourite, setIsFavourite] = useState(false)
 
+    const fetchFavourite = async (eventId) => {
+        if (!info) return;
+        try {
+            const response = await axiosInstance.get(`/favourites/${eventId}`);
+            if (response.status === 200) {
+                setIsFavourite(response.data.result);
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    };
+
+    const fetchDetailsEvent = async (eventId) => {
+        try {
+            const response = await axiosPublic.get(`/events/${eventId}`);
+            if (response.status === 200) {
+                setEventInfo(response.data.result);
+                fetchFavourite(eventId);
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    };
+
+    const handleFavourite = async () => {
+        if (!info) return;
+        try {
+            const response = await axiosInstance.post(`/favourites/${eventId}`);
+            if (response.status === 200) {
+                setIsFavourite(!isFavourite)
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    };
+
+
     useEffect(() => {
-        setEventInfo(events.find(event => event.id === eventId))
-        setGallery(galleries.find(gal => gal.eventId === eventId))
-    }, [eventId, events]);
+        fetchDetailsEvent(eventId)
+    }, [eventId]);
 
     if (!eventInfo || !gallery) return <SkeletonCard />
-    console.log(gallery.gallery)
+
     return (
         <div className='flex flex-col container items-center gap-6 justify-center mx-auto py-10 px-6 md:px-20 lg:px-32 relative'>
             {/* ---------------> Tittle <-------------- */}
             <div className='text-center gap-4 md:gap-1 flex flex-col md:flex-row items-center w-full text-4xl font-semibold text-cyan-900 border-b border-cyan-700 pb-6 px-2'>
                 <div className='flex flex-row'>
                     <BiChevronsRight />
-                    <p className='text-left'>Topic: {eventInfo.name}</p>
+                    <p className='text-left'>Topic: {eventInfo.eventName}</p>
                 </div>
             </div>
 
@@ -58,21 +126,21 @@ const Details = () => {
                 {/* ----------------->  Left Side */}
                 <div className='w-full md:w-4/6 flex-row'>
                     {/* -----------> Main image */}
-                    <img src={eventInfo.image} alt="" className='w-full rounded-3xl' />
+                    <img src={eventInfo.photoEvents[0].photoEventId} alt="" className='w-full rounded-3xl' />
                     {/* --------------> Over view infor */}
                     <div className='flex flex-col gap-4 py-4 md:py-1 items-center md:flex-row justify-between my-2 px-10 border-gray-200 text-cyan-900 border-t border-b'>
                         <div className='flex flex-row gap-2 items-center'>
                             <MdOutlineTypeSpecimen className='size-7' />
                             <div className='flex flex-col'>
                                 <p className='font-semibold text-lg'>Event type</p>
-                                <p>Business</p>
+                                <p>{eventInfo.types[0].typeName}</p>
                             </div>
                         </div>
                         <div className='flex flex-row gap-2 items-center'>
                             <GiPublicSpeaker className='size-7' />
                             <div className='flex flex-col'>
                                 <p className='font-semibold text-lg'>Speaker</p>
-                                <p>5 Speaker</p>
+                                <p>{eventInfo.speakers.length} Speaker</p>
                             </div>
                         </div>
                         <div className='flex flex-col items-center'>
@@ -83,7 +151,7 @@ const Details = () => {
 
                     {/* description */}
                     <div className='py-7 text-cyan-900 text-justify'>
-                        <p>Cras semper, massa vel aliquam luctus, eros odio tempor turpis, ac placerat metus tortor eget magna. Donec mattis posuere pharetra. Donec vestibulum ornare velit ut sollicitudin. Pellentesque in faucibus purus.Nulla nisl tellus, hendrerit nec dignissim pellentesque, posuere in est. Suspendisse bibendum vestibulum elit eu placerat. In ut ipsum in odio euismod tincidunt non lacinia nunc. Donec ligula augue, mattis eu varius ac.</p>
+                        <p>{eventInfo.eventDescription}</p>
                     </div>
                     {/* Gallery */}
                     <div className=' border-t relative min-h-32'>
@@ -92,8 +160,8 @@ const Details = () => {
                             <p>Gallery</p>
                         </div>
                         <div className='py-20 grid grid-cols-2 md:grid-cols-3 gap-2'>
-                            {gallery.gallery.map((src, index) => (
-                                <img key={index} src={src} className='w-full h-full object-cover rounded-md' />
+                            {eventInfo.photoEvents.map((photo, index) => (
+                                <img key={photo.photoEventId} src={photo.photoEventId} className='w-full h-full object-cover rounded-md' />
                             ))
                             }
                         </div>
@@ -165,11 +233,11 @@ const Details = () => {
 
                     <div className='border rounded-lg border-gray-200 shadow-2xl relative h-fit'>
                         {isFavourite ?
-                            (<div onClick={() => setIsFavourite(false)} className='absolute gap-4 bg-gray-400 rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl'>
+                            (<div onClick={() => handleFavourite()} className='absolute gap-4 bg-gray-400 rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl'>
                                 <MdOutlineRemoveCircle />
                                 <p>Unfavourite</p>
                             </div>) :
-                            (<div onClick={() => setIsFavourite(true)} className='absolute gap-4 bg-pink-400 border rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-gray-100 font-semibold text-xl'>
+                            (<div onClick={() => handleFavourite()} className='absolute gap-4 bg-pink-400 border rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-gray-100 font-semibold text-xl'>
                                 <FaHeart />
                                 <p>Favourite</p>
                             </div>)}
@@ -178,12 +246,18 @@ const Details = () => {
                                 {/* content here */}
                                 <div className='flex gap-2 items-center'>
                                     <MdOutlineShareLocation />
-                                    <p>Location: Broadway, New York</p>
+                                    <p>Location: {eventInfo.eventLocation}</p>
                                 </div>
-                                <div className='flex gap-2 items-center'>
-                                    <MdEventNote />
-                                    <p>Calender: January 21, 2021</p>
-                                </div>
+                                <div className='flex gap-2 flex-col text-lg'>
+                                    <div className='flex gap-2 items-center'>
+                                        <MdEventNote className='text-green-700' />
+                                        <p>Start at: {datimeToEnUS(eventInfo.startTime)}</p>
+                                    </div>
+                                    <div className='flex gap-2 items-center'>
+                                        <MdEventNote className='text-red-700' />
+                                        <p>End at:&nbsp;&nbsp; {datimeToEnUS(eventInfo.endTime)}</p>
+                                    </div></div>
+
 
                                 {/* orgnizer */}
                                 <div className='flex gap-2 flex-col mx-5'>
@@ -192,9 +266,9 @@ const Details = () => {
                                         <p className='font-semibold border-gray-300 text-red-700 border-t border-b w-fit'>Organizer</p>
                                     </div>
                                     <div className='flex gap-4'>
-                                        <img src="https://flux-image.com/_next/image?url=https%3A%2F%2Fai.flux-image.com%2Fflux%2F3294fb66-47e2-47ac-baed-bf61403bf21f.jpg&w=3840&q=75" alt="" className='w-1/4 rounded-full aspect-square' />
+                                        <img src={eventInfo.user.avatarUrl} alt="" className='w-1/4 rounded-full aspect-square object-cover' />
                                         <div className='flex flex-col justify-center'>
-                                            <p className='font-semibold text-2xl'>Daniel Matthew</p>
+                                            <p className='font-semibold text-2xl'>{eventInfo.user.firstName} {eventInfo.user.lastName}</p>
                                             <p>Organizer</p>
                                         </div>
                                     </div>
@@ -203,7 +277,7 @@ const Details = () => {
                                 <div className='flex flex-col gap-2 px-4 items-center py-2 text-4xl font-semibold'>
                                     <div className='flex items-center gap-2'>
                                         <CiBoxList className='size-10 text-red-700 font-bold' />
-                                        <p><span className='text-6xl text-red-700'>20</span>/40 seats </p>
+                                        <p><span className='text-6xl text-red-700'>{eventInfo.availableTickets}</span>/{eventInfo.totalTickets} seats </p>
                                     </div>
                                     <p className='text-2xl'>available now!</p>
                                 </div>
@@ -223,31 +297,17 @@ const Details = () => {
                             <GiPublicSpeaker />
                             <p>Best Speaker</p>
                         </div>
-                        <div className='w-full flex-col flex gap-6 pt-28 text-left justify-start px-5 min-h-80 text-xl text-cyan-900 pb-10 md:pb-5'>
+                        <div className='w-full flex-col flex gap-6 pt-28 text-left justify-start px-5 min-h-80 text-xl text-cyan-900 pb-10 md:pb-6'>
                             {/* speaker 1 */}
-                            <div className='flex gap-4 hover:-translate-x-4 hover:scale-105 hover:bg-gray-50 rounded-full bg-white duration-300'>
-                                <img src="https://t4.ftcdn.net/jpg/06/48/39/19/360_F_648391979_uMz6EwAlKNIJnK9r46UpTiM17nT8GuLl.jpg" alt="" className='w-1/3 aspect-square object-cover rounded-full' />
-                                <div className='flex flex-col justify-center'>
-                                    <p className='font-semibold text-2xl'>Matt Liu</p>
-                                    <p>Business</p>
+                            {eventInfo.speakers.map((speaker, index) => (
+                                <div className='flex gap-4 hover:-translate-x-4 hover:scale-105 hover:bg-gray-50 rounded-full bg-white duration-300'>
+                                    <img src={speaker.speakerImageUrl} alt="" className='w-1/3 aspect-square object-cover rounded-full' />
+                                    <div className='flex flex-col justify-center'>
+                                        <p className='font-semibold text-2xl'>{speaker.speakerName}</p>
+                                        <p>{speaker.speakerCareer}</p>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className='flex gap-4 hover:-translate-x-4 hover:scale-105 hover:bg-gray-50 rounded-full bg-white duration-300'>
-                                <img src="https://cdn.pixabay.com/photo/2023/12/19/22/46/business-8458541_640.jpg" alt="" className='w-1/3 aspect-square object-cover rounded-full' />
-                                <div className='flex flex-col justify-center'>
-                                    <p className='font-semibold text-2xl'>Sophia Grahan</p>
-                                    <p>Data analysis</p>
-                                </div>
-                            </div>
-
-                            <div className='flex gap-4 hover:-translate-x-4 hover:scale-105 hover:bg-gray-50 rounded-full bg-white duration-300'>
-                                <img src="https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM=" alt="" className='w-1/3 aspect-square object-cover rounded-full' />
-                                <div className='flex flex-col justify-center'>
-                                    <p className='font-semibold text-2xl'>Polia Yetmian</p>
-                                    <p>Lawyer</p>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
 

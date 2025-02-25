@@ -82,7 +82,6 @@ const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) =
                 <a className='bg-blue-100 text-gray-600 px-12 py-3 rounded-full pt-4 hover:bg-cyan-900 hover:text-white duration-300 cursor-pointer flex'>See more
                 </a>
             </div>}
-
         </div>
     )
 }

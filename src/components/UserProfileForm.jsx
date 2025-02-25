@@ -100,12 +100,10 @@ const UserProfile = () => {
 
     const saveChanges = (e) => {
         e.preventDefault();
-        console.log(e.nativeEvent.submitter.id);
         if (e.nativeEvent.submitter.id !== 'save-btn') return;
         if (editedInfo.firstName === ''
             || editedInfo.lastName === ''
-            || editedInfo.bio === '' ||
-            editedInfo.email === '' || editedInfo.birth === ''
+            || editedInfo.email === '' || editedInfo.birth === ''
             || editedInfo.address === '' || editedInfo.gender === '') {
             return;
         }

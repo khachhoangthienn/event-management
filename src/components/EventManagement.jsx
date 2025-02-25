@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiCalendar, FiUsers, FiPackage, FiImage, FiCheck, FiTag } from 'react-icons/fi';
-import { AppContext } from '@/context/AppContext';
+import { FiPlus, FiEdit2, FiTrash2, FiCalendar, FiUsers, FiPackage, FiTag } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import CreateEventForm from './EditEventModal';
 import UpdateEventForm from './UpdateEventModal';
-import { axiosInstance } from '@/axiosConfig';
+import { axiosInstance, axiosPublic } from '@/axiosConfig';
+import confirmToast from './ui/confirmToast';
 
 const EventManagement = () => {
-    const { categories } = useContext(AppContext);
     const [myEvents, setMyEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -32,6 +31,25 @@ const EventManagement = () => {
                         setSelectedEvent(foundEvent || null);
                     }
                 }, 0);
+            }
+        } catch (error) {
+            if (error.response) {
+                const { code, message } = error.response.data;
+                toast.error(message);
+                console.log("this is error code: " + code);
+            } else {
+                console.error("Error:", error.message);
+                toast.error("Lấy sự kiện thất bại");
+            }
+        }
+    };
+
+    const deleteEvent = async (eventId) => {
+        try {
+            const response = await axiosPublic.delete(`/events/${eventId}`);
+            if (response.status === 200) {
+                toast.success("Event has been deleted!");
+                getMyEvents();
             }
         } catch (error) {
             if (error.response) {
@@ -77,7 +95,10 @@ const EventManagement = () => {
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                            setCurrentPage(1);
+                            setActiveTab(tab.id)
+                        }}
                         className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${activeTab === tab.id
                             ? 'bg-white text-cyan-900 shadow-sm'
                             : 'text-cyan-600 hover:text-cyan-900'
@@ -147,7 +168,7 @@ const EventManagement = () => {
                         {/* Nút thao tác */}
                         <div className="flex flex-col items-center gap-2">
                             <button className="p-2 text-cyan-900 hover:bg-cyan-50 rounded-lg" onClick={() => {
-                                if (event.eventStatus == "APPROVED") {
+                                if (event.eventStatus == "APPROVED" || event.eventStatus == "FINISHED") {
                                     toast.error("Cannot update this event");
                                     return;
                                 }
@@ -156,7 +177,16 @@ const EventManagement = () => {
                             }}>
                                 <FiEdit2 />
                             </button>
-                            <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                            <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg" onClick={() => {
+                                if (event.eventStatus == "APPROVED" || event.eventStatus == "FINISHED") {
+                                    toast.error("Cannot delete this event");
+                                    return;
+                                }
+
+                                confirmToast("Are you sure you want to delete this event?", () => {
+                                    deleteEvent(event.eventId);
+                                });
+                            }}>
                                 <FiTrash2 />
                             </button>
                         </div>

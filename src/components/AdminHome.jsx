@@ -3,6 +3,8 @@ import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingU
 import AttendeeDashboard from "./AttendeeDashboard";
 import FavoriteEvents from "./FavoriteEvents";
 import AdminEventApproval from "./EventApproval";
+import { CiAlignLeft } from "react-icons/ci";
+
 
 const AdminHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -16,9 +18,7 @@ const AdminHome = () => {
                         <h3 className="text-lg font-semibold text-cyan-900 mb-4">Navigation</h3>
                         {[
                             { id: "dashboard", icon: FiHome, label: "Dashboard" },
-                            { id: "favorites", icon: FiHeart, label: "Favorite Events" },
-                            { id: "tickets", icon: FiCreditCard, label: "My Tickets" },
-                            { id: "notifications", icon: FiBell, label: "Notifications" },
+                            { id: "statistic", icon: CiAlignLeft, label: "Statistic event" },
                         ].map(({ id, icon: Icon, label }) => (
                             <button
                                 key={id}
