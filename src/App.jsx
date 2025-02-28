@@ -11,6 +11,7 @@ import About from './page/About'
 import Contact from './page/Contact'
 import Profile from './page/Profile'
 import { ToastContainer } from 'react-toastify'
+import VnPayCallback from './page/VnPayCallback'
 const App = () => {
   return (
     <div>
@@ -24,6 +25,7 @@ const App = () => {
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/payment/vn-pay-callback' element={<VnPayCallback />} />
       </Routes>
       <Footer />
       <ToastContainer />

@@ -8,34 +8,78 @@ import { use } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { FaTicketAlt } from "react-icons/fa";
-import { info } from 'autoprefixer';
-
-
-
+import axiosInstance, { axiosPublic } from '@/axiosConfig';
+import { UserContext } from '@/context/UserContext';
+import { toast } from 'react-toastify';
 
 
 const PricingPlan = () => {
-    const [flipped, setFlipped] = useState(false);
+    const { eventId } = useParams();
     const [selectedPack, setSelectedPack] = useState(null);
+    const { info } = useContext(UserContext)
+    const [packInfo, setPackInfo] = useState(null)
     const [numTicket, setNumTicket] = useState(1)
     const location = useLocation()
+    const [flipped, setFlipped] = useState(false)
+    const [eventInfo, setEventInfo] = useState(null)
 
-    const { eventInfo } = location.state || {}
+    useEffect(() => {
+        const fetchEventInfo = async () => {
+            try {
+                const response = await axiosInstance.get(`/events/${eventId}`);
+                if (response.status === 200) {
+                    setEventInfo(response.data.result);
+                }
+            } catch (error) {
+                console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+                if (error.response) {
+                    const { code } = error.response.data;
+                    if (code === 404) {
+                        console.error("No data found.");
+                    } else if (code === 401) {
+                        console.error("Unauthorized request.");
+                    }
+                } else {
+                    console.error("Error:", error.message);
+                }
+            }
+        };
+        fetchEventInfo()
+    }, [])
 
+    const paymentRequest = async () => {
+        try {
+            const response = await axiosInstance.get(`/payment/vn-pay?userId=${info.userId}&amount=${packInfo.packagePrice * numTicket}&bankCode=NCB&packageId=${selectedPack}&packageCount=${numTicket}`);
+            if (response.status === 200) {
+                console.log(response.data)
+                // console.log("Payment URL: ", response.data.data.paymentUrl)
+                window.location.href = response.data.data.paymentUrl
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("Has an error! Please try again");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    };
     useEffect(() => {
         setNumTicket(1)
     }, [flipped])
-
-
-    const plusTicket = () => setNumTicket(numTicket + 1);
-    const minusTicket = () => setNumTicket(numTicket > 1 ? numTicket - 1 : 1);
 
     const handleFlip = (id) => {
         if (selectedPack === id) {
             setSelectedPack(null);
         } else {
-            setNumTicket(0);
+            setNumTicket(1);
             setSelectedPack(id);
+            setPackInfo(eventInfo.packagePrices.find(pack => pack.packageId === id));
         }
     };
 
@@ -99,7 +143,13 @@ const PricingPlan = () => {
                                     <div className="relative bg-white border-red-700 border-2 rounded-tr-2xl rounded-2xl min-w-fit mb-2 flex justify-center items-center text-white font-semibold text-2xl">
                                         <div className="flex justify-center px-2 rounded-tr-lg rounded-br-lg py-4 w-1/2 cursor-pointer text-black">
                                             <div
-                                                onClick={() => setNumTicket(numTicket + 1)}
+                                                onClick={() => {
+                                                    if (numTicket >= item.availableTickets) {
+                                                        toast.error("Not enough tickets available")
+                                                        return
+                                                    }
+                                                    setNumTicket(numTicket + 1)
+                                                }}
                                                 className="w-1/3 border-r-2 flex justify-center hover:text-red-700 select-none"
                                             >+</div>
 
@@ -111,7 +161,14 @@ const PricingPlan = () => {
                                             >-</div>
                                         </div>
 
-                                        <div className="flex justify-center px-2 border-l-2 border-red-700 bg-red-700 rounded-tr-xl rounded-br-xl py-4 w-1/2 cursor-pointer hover:text-red-700 hover:bg-white duration-300">
+                                        <div onClick={() => {
+                                            if (numTicket > item.availableTickets) {
+                                                toast.error("Not enough tickets available")
+                                                return
+                                            }
+                                            paymentRequest()
+                                        }}
+                                            className="flex justify-center px-2 border-l-2 border-red-700 bg-red-700 rounded-tr-xl rounded-br-xl py-4 w-1/2 cursor-pointer hover:text-red-700 hover:bg-white duration-300">
                                             Buy ticket
                                         </div>
                                     </div>

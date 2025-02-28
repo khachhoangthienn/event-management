@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp } from "react-icons/fi";
 import AttendeeDashboard from "./AttendeeDashboard";
 import FavoriteEvents from "./FavoriteEvents";
+import InvoiceList from "./InvoiceList";
 
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -16,7 +17,7 @@ const AttendeeHome = () => {
                         {[
                             { id: "dashboard", icon: FiHome, label: "Dashboard" },
                             { id: "favorites", icon: FiHeart, label: "Favorite Events" },
-                            { id: "tickets", icon: FiCreditCard, label: "My Tickets" },
+                            { id: "invoices", icon: FiCreditCard, label: "My Invoices" },
                             { id: "notifications", icon: FiBell, label: "Notifications" },
                         ].map(({ id, icon: Icon, label }) => (
                             <button
@@ -38,6 +39,7 @@ const AttendeeHome = () => {
                 <div className="flex-1 max-w-5xl space-y-6">
                     {activeMenu === "dashboard" && <AttendeeDashboard />}
                     {activeMenu === "favorites" && <FavoriteEvents />}
+                    {activeMenu === "invoices" && <InvoiceList />}
                 </div>
             </div>
         </div>

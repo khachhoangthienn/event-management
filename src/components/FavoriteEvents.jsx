@@ -64,21 +64,6 @@ const FavoriteEvents = () => {
         fetchFavouriteEvents();
     }, [filterType, sortBy]);
 
-    // if (myFavoriteEvents.length === 0) return (
-    //     <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white p-6">
-    //         <div className="max-w-6xl mx-auto space-y-6">
-    //             <div className="text-center py-12">
-    //                 <FiHeart className="text-5xl text-cyan-900 mx-auto mb-4" />
-    //                 <h3 className="text-xl font-semibold text-cyan-900 mb-2">No Favorite Events Yet</h3>
-    //                 <p className="text-gray-600">Start exploring events and save your favorites!</p>
-    //                 <button onClick={() => navigate(`/events`)}
-    //                     className="mt-6 px-6 py-3 bg-cyan-900 text-white rounded-lg hover:bg-cyan-800 transition-colors">
-    //                     Explore Events
-    //                 </button>
-    //             </div>
-    //         </div>
-    //     </div>
-    // )
     return (
         <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white p-6">
             <div className="max-w-6xl mx-auto space-y-6">
@@ -124,7 +109,7 @@ const FavoriteEvents = () => {
                                 <img
                                     src={favourite.event.photoEvents[0].photoEventId}
                                     alt={favourite.event.name}
-                                    className="w-full h-60 object-cover"
+                                    className="w-full h-50 object-cover"
                                 />
                                 <div className="absolute top-4 right-4 flex gap-2">
                                     <button className="p-3 bg-white rounded-full text-red-500 shadow-lg hover:bg-red-50 transition-colors">
@@ -137,7 +122,7 @@ const FavoriteEvents = () => {
                             </div>
 
                             {/* Event Details */}
-                            <div className="p-8">
+                            <div className="px-8 py-2">
                                 <div className="mb-6">
                                     <h3 className="text-2xl font-semibold text-cyan-900 mb-2">{favourite.event.eventName}</h3>
                                     <div className="flex items-center text-gray-600">
@@ -145,14 +130,14 @@ const FavoriteEvents = () => {
                                         <span>By {favourite.event.user.firstName} {favourite.event.user.lastName}</span>
                                     </div>
                                 </div>
-                                <div className="space-y-4">
+                                <div className="flex flex-col gap-2">
                                     <div className="flex items-center text-gray-600">
                                         <FiCalendar className="mr-2 text-green-700" />
-                                        <span>{datimeToEnUS(favourite.event.startTime)}</span>
+                                        <span>Start: {datimeToEnUS(favourite.event.startTime)}</span>
                                     </div>
                                     <div className="flex items-center text-gray-600">
                                         <FiCalendar className="mr-2" />
-                                        <span>{datimeToEnUS(favourite.event.endTime)}</span>
+                                        <span>End: {datimeToEnUS(favourite.event.endTime)}</span>
                                     </div>
                                     <div className="flex items-center text-gray-600">
                                         <FiMapPin className="mr-2" />
@@ -160,7 +145,7 @@ const FavoriteEvents = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-8 flex items-center justify-between">
+                                <div className="my-2 flex items-center justify-between">
                                     <span className="px-4 py-2 bg-green-100 text-green-700 rounded-full text-base">
                                         {favourite.event.availableTickets} seats available
                                     </span>
@@ -180,7 +165,8 @@ const FavoriteEvents = () => {
                         <FiHeart className="text-5xl text-cyan-900 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-cyan-900 mb-2">No Favorite Events Yet</h3>
                         <p className="text-gray-600">Start exploring events and save your favorites!</p>
-                        <button className="mt-6 px-6 py-3 bg-cyan-900 text-white rounded-lg hover:bg-cyan-800 transition-colors">
+                        <button onClick={() => navigate("/events")}
+                            className="mt-6 px-6 py-3 bg-cyan-900 text-white rounded-lg hover:bg-cyan-800 transition-colors">
                             Explore Events
                         </button>
                     </div>

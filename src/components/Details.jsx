@@ -19,6 +19,9 @@ import { Button } from './ui/button';
 import axiosInstance, { axiosPublic } from '@/axiosConfig';
 import { datimeToEnUS } from '@/utils';
 import { UserContext } from '@/context/UserContext';
+import { comment } from 'postcss';
+import { toast } from 'react-toastify';
+import moment from 'moment';
 
 const Details = () => {
     const { eventId } = useParams();
@@ -36,6 +39,7 @@ const Details = () => {
     const [numComment, setNumComment] = useState(0)
     // Set input of comment by onChange
     const [inputComment, setInputComment] = useState("")
+    const [rating, setRating] = useState(0)
     // favourite
     const [isFavourite, setIsFavourite] = useState(false)
 
@@ -67,6 +71,7 @@ const Details = () => {
             if (response.status === 200) {
                 setEventInfo(response.data.result);
                 fetchFavourite(eventId);
+                fetchComments();
             }
         } catch (error) {
             console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
@@ -104,6 +109,58 @@ const Details = () => {
             }
         }
     };
+
+    const fetchComments = async () => {
+        try {
+            const response = await axiosInstance.get(`/reviews/${eventId}`);
+            if (response.status === 200) {
+                setComments(response.data.result);
+                console.log(response.data.result);
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    };
+
+    const pushComment = async () => {
+        if (!info) return;
+        if (!inputComment) {
+            toast.error("Please input your comment.");
+            return;
+        }
+        try {
+            const response = await axiosInstance.post(`/reviews/${eventId}`, { comment: inputComment, rating: rating });
+            if (response.status === 200) {
+                toast.success("Comment successfully.");
+                fetchComments();
+                setRating(0);
+                setInputComment("");
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    };
+
 
 
     useEffect(() => {
@@ -179,50 +236,72 @@ const Details = () => {
 
                         <div className='flex flex-col py-20 text-justify gap-5'>
                             {/* Comment bar */}
-                            <div className='flex gap-4 py-5 border-b'>
-                                <img src="https://t4.ftcdn.net/jpg/06/48/39/19/360_F_648391979_uMz6EwAlKNIJnK9r46UpTiM17nT8GuLl.jpg" alt="" className='size-12 aspect-square object-cover rounded-full' />
-                                <div className='w-full'>
-                                    <div className='flex gap-2 items-center'>
-                                        <p className='font-semibold text-lg'>Matt Liu</p>
-                                        <ReactStars count={5} size={26} />
+
+                            {info &&
+                                <div className='flex gap-4 py-5 border-b'>
+                                    <img src={info.avatarUrl} alt="" className='size-12 aspect-square object-cover rounded-full' />
+                                    <div className='w-full'>
+                                        <div className='flex gap-2 items-center'>
+                                            <p className='font-semibold text-lg'>{info.firstName} {info.lastName}</p>
+                                            <ReactStars count={5} size={26} value={rating} onChange={setRating} />
+                                        </div>
+                                        <div className='flex gap-3 rounded-3xl bg-gray-200 p-2 w-full items-center'>
+                                            <input placeholder='Input your comment here'
+                                                value={inputComment}
+                                                onChange={(e) => setInputComment(e.target.value)}
+                                                className='flex flex-1 rounded-full bg-none justify-center min-h-10 l px-4'></input>
+                                            <IoMdSend
+                                                onClick={() => pushComment()}
+                                                className='size-7 mr-2 cursor-pointer' />
+                                        </div>
                                     </div>
-                                    <div className='flex gap-3 rounded-3xl bg-gray-200 p-2 w-full items-center'>
-                                        <input className='flex flex-1 rounded-full bg-none justify-center min-h-10 l px-4'></input>
-                                        <IoMdSend className='size-7 mr-2' />
+                                </div>}
+
+
+                            {/* Comment */}
+                            {comments.length > 0 && comments.map((comment, index) => (
+                                <div key={index} className='flex gap-4'>
+                                    {/* Ảnh đại diện */}
+                                    <img
+                                        src={comment.user.avatarUrl}
+                                        alt="Noname"
+                                        className='size-12 aspect-square object-cover rounded-full'
+                                    />
+
+                                    {/* Nội dung bình luận */}
+                                    <div className='flex flex-col justify-center'>
+                                        <div className="flex items-center gap-2">
+                                            <p className='font-semibold text-lg'>{comment.user.firstName} {comment.user.lastName}</p>
+                                            <span className="text-sm text-gray-500">
+                                                {moment(comment.createdAt).fromNow()}
+                                            </span>
+                                        </div>
+
+                                        {/* Đánh giá sao */}
+                                        <ReactStars
+                                            count={5}
+                                            size={26}
+                                            value={comment.rating}
+                                            edit={false}
+                                            className='my-[-5px]'
+                                        />
+
+                                        {/* Nội dung bình luận */}
+                                        <p className='font-light'>{comment.comment}</p>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
 
-                            <div className='flex gap-4'>
-                                <img src="https://t4.ftcdn.net/jpg/06/48/39/19/360_F_648391979_uMz6EwAlKNIJnK9r46UpTiM17nT8GuLl.jpg" alt="" className='size-12 aspect-square object-cover rounded-full' />
-                                <div className='flex flex-col justify-center'>
-                                    <p className='font-semibold text-lg'>Matt Liu</p>
-                                    <ReactStars count={5} size={26} value={4} edit={false} className='my-[-5px]' />
-                                    <p className='font-light'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo velit, reiciendis consequuntur nam aperiam assumenda commodi exercitationem similique, saepe, iste optio neque. Veniam, fuga! Eum voluptatibus quaerat nesciunt! Id, eaque! Repellat, ducimus. Minima quos tenetur laborum voluptas ipsam officia voluptate?</p>
-                                </div>
-                            </div>
+                            {comments.length == 0 &&
+                                <div className='flex justify-center'>
+                                    <p>No comment yet!</p>
+                                </div>}
 
-                            <div className='flex gap-4'>
-                                <img src="https://t4.ftcdn.net/jpg/06/48/39/19/360_F_648391979_uMz6EwAlKNIJnK9r46UpTiM17nT8GuLl.jpg" alt="" className='size-12 aspect-square object-cover rounded-full' />
-                                <div className='flex flex-col justify-center'>
-                                    <p className='font-semibold text-lg'>Matt Liu</p>
-                                    <ReactStars count={5} size={26} value={4} edit={false} className='my-[-5px]' />
-                                    <p className='font-light'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo velit, reiciendis consequuntur nam aperiam assumenda commodi exercitationem similique, saepe, iste optio neque. Veniam, fuga! Eum voluptatibus quaerat nesciunt! Id, eaque! Repellat, ducimus. Minima quos tenetur laborum voluptas ipsam officia voluptate?</p>
-                                </div>
-                            </div>
-
-                            <div className='flex gap-4'>
-                                <img src="https://t4.ftcdn.net/jpg/06/48/39/19/360_F_648391979_uMz6EwAlKNIJnK9r46UpTiM17nT8GuLl.jpg" alt="" className='size-12 aspect-square object-cover rounded-full' />
-                                <div className='flex flex-col justify-center'>
-                                    <p className='font-semibold text-lg'>Matt Liu</p>
-                                    <ReactStars count={5} size={26} value={4} edit={false} className='my-[-5px]' />
-                                    <p className='font-light'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo velit, reiciendis consequuntur nam aperiam assumenda commodi exercitationem similique, saepe, iste optio neque. Veniam, fuga! Eum voluptatibus quaerat nesciunt! Id, eaque! Repellat, ducimus. Minima quos tenetur laborum voluptas ipsam officia voluptate?</p>
-                                </div>
-                            </div>
-
+                            {/* 
                             <div className='flex justify-center'>
                                 <a className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10 hover:bg-cyan-900 hover:text-white duration-300 cursor-pointer'>See more</a>
-                            </div>
+                            </div> */}
+
                         </div>
                     </div>
 
@@ -281,7 +360,7 @@ const Details = () => {
                                     </div>
                                     <p className='text-2xl'>available now!</p>
                                 </div>
-
+                                {/* {eventInfo.endTime < new Date() ? ( */}
                                 <div onClick={() => navigate(`pricing-plan`, { state: { eventInfo } })} className='gap-4 bg-red-700 rounded-tr-2xl hover:scale-110 cursor-pointer transition-all duration-300 rounded-2xl px-4 min-w-fit py-5 mb-7 flex justify-center items-center text-white font-semibold text-3xl'>
                                     <LuTicketCheck />
                                     <p>Buy ticket now!</p>

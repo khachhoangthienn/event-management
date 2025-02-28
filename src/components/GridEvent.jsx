@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MdOutlineShareLocation } from "react-icons/md";
 import { MdEventNote } from "react-icons/md";
 import { CiBoxList } from "react-icons/ci";
-import { FaArrowAltCircleRight } from "react-icons/fa";
 import { datimeToEnUS } from '@/utils'
 
 const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) => {
@@ -75,7 +74,7 @@ const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) =
                 {indexPage > 0 && <p className='text-cyan-700 text-sm mt-10'>{indexPage}</p>}
                 <p className=' text-center text-cyan-700 text-2xl mt-10 border-2 min-w-10 border-gray-500 rounded-md p-1'>{indexPage + 1}</p>
                 {indexPage * number + number < showEvents.length && <p className='text-cyan-700 text-sm mt-10'>{indexPage + 2}</p>}
-                <a onClick={() => { setindexPage(prev => prev * number + number > showEvents.length ? prev : prev + 1) }} className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10  hover:bg-cyan-900 hover:text-white'>Next</a>
+                <a onClick={() => { setindexPage(prev => (prev + 1) * number >= showEvents.length ? prev : prev + 1); }} className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10  hover:bg-cyan-900 hover:text-white'>Next</a>
             </div>}
 
             {slice == 'seemore' && <div className='flex w-full items-start justify-end'>
