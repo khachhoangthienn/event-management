@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiCalendar, FiUsers, FiPackage, FiTag } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiCalendar, FiUsers, FiPackage, FiTag, FiBell } from 'react-icons/fi';
+import { TbCalendarCancel } from "react-icons/tb";
 import { toast } from 'react-toastify';
 import CreateEventForm from './EditEventModal';
 import UpdateEventForm from './UpdateEventModal';
@@ -63,6 +64,25 @@ const EventManagement = () => {
         }
     };
 
+    const cancelEvent = async (eventId) => {
+        try {
+            const response = await axiosPublic.put(`/events/${eventId}/set-status?status=CANCELLED`);
+            if (response.status === 200) {
+                toast.success("Cancel event successfully!");
+                getMyEvents();
+            }
+        } catch (error) {
+            if (error.response) {
+                const { code, message } = error.response.data;
+                toast.error(message);
+                console.log("this is error code: " + code);
+            } else {
+                console.error("Error:", error.message);
+                toast.error("Has an error!");
+            }
+        }
+    };
+
     useEffect(() => {
         getMyEvents();
     }, [activeTab]);
@@ -72,7 +92,9 @@ const EventManagement = () => {
         { id: 'all', label: 'All Events' },
         { id: 'PENDING', label: 'Pending' },
         { id: 'APPROVED', label: 'Approved' },
-        { id: 'REJECTED', label: 'Rejected' }
+        { id: 'REJECTED', label: 'Rejected' },
+        { id: 'CANCELLED', label: 'Cancel' },
+        { id: 'FINISHED', label: 'Finished' }
     ];
 
     if (!myEvents) return (<div></div>);
@@ -111,6 +133,13 @@ const EventManagement = () => {
 
             {/* Events List */}
             <div className="space-y-4 min-h-[80vh]">
+                {currentEvents.length == 0 && <div className="text-center py-12">
+                    <FiBell className="text-5xl text-cyan-900 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-cyan-900 mb-2">No events here yet</h3>
+                    <p className="text-gray-600">Stay tuned! More events may be added soon.</p>
+
+                </div>
+                }
                 {currentEvents.map((event) => (
                     <div
                         key={event.eventId}
@@ -177,18 +206,32 @@ const EventManagement = () => {
                             }}>
                                 <FiEdit2 />
                             </button>
-                            <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg" onClick={() => {
-                                if (event.eventStatus == "APPROVED" || event.eventStatus == "FINISHED") {
-                                    toast.error("Cannot delete this event");
-                                    return;
-                                }
+                            {/* check if approved? */}
+                            {event.eventStatus == "APPROVED" ?
+                                (<button className="p-2 text-red-500 hover:bg-red-50 rounded-lg" onClick={() => {
+                                    // if (event.eventStatus == "APPROVED" || event.eventStatus == "FINISHED") {
+                                    //     toast.error("Cannot delete this event");
+                                    //     return;
+                                    // }
+                                    confirmToast("Are you sure you want to cancel this event?", () => {
+                                        cancelEvent(event.eventId);
+                                    });
+                                }}>
+                                    <TbCalendarCancel />
+                                </button>)
+                                : (<button className="p-2 text-red-500 hover:bg-red-50 rounded-lg" onClick={() => {
+                                    // if (event.eventStatus == "FINISHED") {
+                                    //     toast.error("Cannot delete this event");
+                                    //     return;
+                                    // }
 
-                                confirmToast("Are you sure you want to delete this event?", () => {
-                                    deleteEvent(event.eventId);
-                                });
-                            }}>
-                                <FiTrash2 />
-                            </button>
+                                    confirmToast("Are you sure you want to delete this event?", () => {
+                                        deleteEvent(event.eventId);
+                                    });
+                                }}>
+                                    <FiTrash2 />
+                                </button>)
+                            }
                         </div>
                     </div>
                 ))}

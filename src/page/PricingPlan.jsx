@@ -19,8 +19,6 @@ const PricingPlan = () => {
     const { info } = useContext(UserContext)
     const [packInfo, setPackInfo] = useState(null)
     const [numTicket, setNumTicket] = useState(1)
-    const location = useLocation()
-    const [flipped, setFlipped] = useState(false)
     const [eventInfo, setEventInfo] = useState(null)
 
     useEffect(() => {
@@ -69,9 +67,6 @@ const PricingPlan = () => {
             }
         }
     };
-    useEffect(() => {
-        setNumTicket(1)
-    }, [flipped])
 
     const handleFlip = (id) => {
         if (selectedPack === id) {

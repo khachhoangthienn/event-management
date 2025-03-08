@@ -103,10 +103,7 @@ const UpdateEventForm = ({ onClose, currentEvent, refreshEvent }) => {
         }
         try {
             setIsLoading(true);
-
             const updateUrls = await axiosPublic.put(`/events/${eventId}/update-urls`, data);
-
-
             if (!speakerFormdata.entries().next().done) {
                 try {
                     var updateImagesSpeaker = await axiosPublicFormData.put(`/events/${eventId}/update-file-speakers`, speakerFormdata);
@@ -116,7 +113,6 @@ const UpdateEventForm = ({ onClose, currentEvent, refreshEvent }) => {
                     return;
                 }
             }
-
             if (!eventFormdata.entries().next().done) {
                 try {
                     var updateImagesEvent = await axiosPublicFormData.put(`/events/${eventId}/update-file-events`, eventFormdata);

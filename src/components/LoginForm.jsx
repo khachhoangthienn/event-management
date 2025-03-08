@@ -91,8 +91,7 @@ const LoginForm = () => {
         }
     };
 
-
-
+    if (info) navigate("/")
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-0 border border-gray-300 min-w-96 py-4 px-5 rounded-xl bg-white relative shadow-xl">
 

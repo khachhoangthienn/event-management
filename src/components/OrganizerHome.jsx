@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp, FiCheckSquare } from "react-icons/fi";
 import OrganizerDashboard from "./OrganizerDashboard";
 import EventManagement from "./EventManagement";
+import Notifications from "./Notification";
 
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -16,7 +17,6 @@ const AttendeeHome = () => {
                         {[
                             { id: "dashboard", icon: FiHome, label: "Dashboard" },
                             { id: "eventManagement", icon: FiCheckSquare, label: "Event Management" },
-                            { id: "tickets", icon: FiCreditCard, label: "Manage Event" },
                             { id: "notifications", icon: FiBell, label: "Notifications" },
                         ].map(({ id, icon: Icon, label }) => (
                             <button
@@ -36,8 +36,9 @@ const AttendeeHome = () => {
 
                 {/* Main Content */}
                 <div className="flex-1 max-w-5xl space-y-6">
-                    {activeMenu === "dashboard" && <OrganizerDashboard />}
+                    {activeMenu === "dashboard" && <OrganizerDashboard setActiveMenu={setActiveMenu} />}
                     {activeMenu === "eventManagement" && <EventManagement />}
+                    {activeMenu === "notifications" && <Notifications />}
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@ import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingU
 import AttendeeDashboard from "./AttendeeDashboard";
 import FavoriteEvents from "./FavoriteEvents";
 import InvoiceList from "./InvoiceList";
+import Notifications from "./Notification";
 
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -37,9 +38,10 @@ const AttendeeHome = () => {
 
                 {/* Main Content */}
                 <div className="flex-1 max-w-5xl space-y-6">
-                    {activeMenu === "dashboard" && <AttendeeDashboard />}
+                    {activeMenu === "dashboard" && <AttendeeDashboard setActiveMenu={setActiveMenu} />}
                     {activeMenu === "favorites" && <FavoriteEvents />}
                     {activeMenu === "invoices" && <InvoiceList />}
+                    {activeMenu === "notifications" && <Notifications />}
                 </div>
             </div>
         </div>

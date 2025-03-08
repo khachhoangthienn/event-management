@@ -29,14 +29,8 @@ const Details = () => {
     const navigate = useNavigate()
     // Information of event
     const [eventInfo, setEventInfo] = useState(null)
-    // Picture here 
-    const [gallery, setGallery] = useState([])
-    // Speaker in event
-    const [speakers, setSpeaker] = useState([])
     // Comment
     const [comments, setComments] = useState([])
-    // See more comment
-    const [numComment, setNumComment] = useState(0)
     // Set input of comment by onChange
     const [inputComment, setInputComment] = useState("")
     const [rating, setRating] = useState(0)
@@ -167,7 +161,7 @@ const Details = () => {
         fetchDetailsEvent(eventId)
     }, [eventId]);
 
-    if (!eventInfo || !gallery) return <SkeletonCard />
+    if (!eventInfo) return <SkeletonCard />
 
     return (
         <div className='flex flex-col container items-center gap-6 justify-center mx-auto py-10 px-6 md:px-20 lg:px-32 relative'>
