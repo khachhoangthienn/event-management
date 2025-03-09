@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp } from "react-icons/fi";
 import AttendeeDashboard from "./AttendeeDashboard";
 import FavoriteEvents from "./FavoriteEvents";
@@ -8,12 +8,16 @@ import Notifications from "./Notification";
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
 
+    useEffect(() => {
+        scroll(0, 0)
+    }, [activeMenu])
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white">
             <div className="flex flex-row justify-center mx-auto py-6 gap-6 px-4 md:px-8 lg:px-12">
                 {/* Left Sidebar */}
-                <div className="hidden md:block w-64 bg-white rounded-2xl shadow-lg border border-cyan-100">
-                    <div className="p-6 space-y-3">
+                <div className="hidden md:block w-64 bg-white rounded-2xl shadow-lg border border-cyan-100 relative">
+                    <div className="p-6 space-y-3 sticky top-4">
                         <h3 className="text-lg font-semibold text-cyan-900 mb-4">Navigation</h3>
                         {[
                             { id: "dashboard", icon: FiHome, label: "Dashboard" },

@@ -3,12 +3,7 @@ import { FiCalendar, FiUsers, FiDollarSign, FiTrendingUp, FiBarChart2, FiActivit
 import { UserContext } from "@/context/UserContext";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { MdWaterfallChart } from "react-icons/md";
-
-
-import { FaChartLine } from "react-icons/fa6";
-
 import axiosInstance from "@/axiosConfig";
-import { MdStackedLineChart } from "react-icons/md";
 
 const OrganizerDashboard = ({ setActiveMenu }) => {
     const { info } = useContext(UserContext);
