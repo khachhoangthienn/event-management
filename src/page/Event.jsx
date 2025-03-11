@@ -1,15 +1,22 @@
+import axiosInstance from '@/axiosConfig'
 import GridEvent from '@/components/GridEvent'
 import Header from '@/components/Header'
 import { EventContext } from '@/context/EventContext'
-import React, { useContext } from 'react'
+import { UserContext } from '@/context/UserContext'
+import React, { useContext, useEffect, useState } from 'react'
 
 const Event = () => {
-    const { popularEvents, types } = useContext(EventContext)
+    const { popularEvents, topEvents, recommendEvent, types, fetchRecommendEvents } = useContext(EventContext)
+
+    useEffect(() => {
+        fetchRecommendEvents()
+    }, [])
+
     return (
         <div>
             <Header type={'Events'} />
-            <GridEvent title="BEST EVENT FOR YOU" events={popularEvents} categories={null} number={6} />
-            <GridEvent title="TOP EVENT" events={popularEvents} categories={null} number={6} />
+            {recommendEvent.length !== 0 && <GridEvent title="BEST EVENT FOR YOU" events={recommendEvent} categories={null} number={6} />}
+            <GridEvent title="TOP EVENT" events={topEvents} categories={null} number={6} />
             <GridEvent title="POPULAR EVENT" events={popularEvents} categories={types} number={9} slice="slice" />
         </div>
     )

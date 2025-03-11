@@ -1,11 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
-import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp } from "react-icons/fi";
-import AttendeeDashboard from "./AttendeeDashboard";
-import FavoriteEvents from "./FavoriteEvents";
+import React, { useEffect, useState } from "react";
+import { FiHome } from "react-icons/fi";
 import AdminEventApproval from "./EventApproval";
 import { CiAlignLeft } from "react-icons/ci";
 import AdminDashboard from "./AdminDashboard";
 import AdminUserManagement from "./UserManagement";
+import { LuUserCog } from "react-icons/lu";
+import { MdOutlineEventAvailable } from "react-icons/md";
+
+
 
 
 const AdminHome = () => {
@@ -24,8 +26,8 @@ const AdminHome = () => {
                         <h3 className="text-lg font-semibold text-cyan-900 mb-4">Navigation</h3>
                         {[
                             { id: "dashboard", icon: FiHome, label: "Dashboard" },
-                            { id: "events", icon: CiAlignLeft, label: "Events Approval" },
-                            { id: "users", icon: CiAlignLeft, label: "Users Management" },
+                            { id: "events", icon: MdOutlineEventAvailable, label: "Events Approval" },
+                            { id: "users", icon: LuUserCog, label: "Users Management" },
                         ].map(({ id, icon: Icon, label }) => (
                             <button
                                 key={id}

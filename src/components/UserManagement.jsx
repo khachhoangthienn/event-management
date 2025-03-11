@@ -61,19 +61,19 @@ const AdminUserManagement = () => {
         setIsModalOpen(true);
     };
 
-    const handleEditClick = (e, user) => {
-        e.stopPropagation();
-        setEditedUser({
-            ...user
-        });
-        setIsEditModalOpen(true);
-    };
+    // const handleEditClick = (e, user) => {
+    //     e.stopPropagation();
+    //     setEditedUser({
+    //         ...user
+    //     });
+    //     setIsEditModalOpen(true);
+    // };
 
-    const handleDeleteClick = (e, user) => {
-        e.stopPropagation();
-        setUserToDelete(user);
-        setIsConfirmModalOpen(true);
-    };
+    // const handleDeleteClick = (e, user) => {
+    //     e.stopPropagation();
+    //     setUserToDelete(user);
+    //     setIsConfirmModalOpen(true);
+    // };
 
     const handleEditSave = async () => {
         try {
@@ -123,24 +123,29 @@ const AdminUserManagement = () => {
                     </div>
 
                     {/* Role Filter */}
-                    <Tabs defaultValue="ATTENDEE" onValueChange={setUserRole} className="w-full sm:w-auto">
-                        <TabsList className="grid w-full sm:w-auto grid-cols-2 bg-cyan-100 p-1 rounded-lg">
-                            <TabsTrigger
-                                value="ATTENDEE"
-                                className={`${userRole === 'ATTENDEE' ? 'bg-cyan-900 text-white' : 'text-cyan-900'} px-4 py-2 rounded-md`}
-                            >
-                                <FiUsers className="inline-block mr-2" />
-                                Attendees
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="ORGANIZER"
-                                className={`${userRole === 'ORGANIZER' ? 'bg-cyan-900 text-white' : 'text-cyan-900'} px-4 py-2 rounded-md`}
-                            >
-                                <FiUser className="inline-block mr-2" />
-                                Organizers
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setUserRole('ATTENDEE')}
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${userRole === 'ATTENDEE'
+                                ? 'bg-cyan-900 text-white'
+                                : 'bg-white border border-cyan-200 text-cyan-900 hover:bg-cyan-50'
+                                }`}
+                        >
+                            <FiUsers className="inline-block mr-2" />
+                            Attendees
+                        </button>
+                        <button
+                            onClick={() => setUserRole('ORGANIZER')}
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${userRole === 'ORGANIZER'
+                                ? 'bg-cyan-900 text-white'
+                                : 'bg-white border border-cyan-200 text-cyan-900 hover:bg-cyan-50'
+                                }`}
+                        >
+                            <FiUser className="inline-block mr-2" />
+                            Organizers
+                        </button>
+                    </div>
+
                 </div>
 
                 {/* Search and Filter Section */}
@@ -232,7 +237,7 @@ const AdminUserManagement = () => {
 
                     {/* Empty State */}
                     {filteredUsers.length === 0 && (
-                        <div className="text-center py-12 bg-white rounded-lg border border-cyan-100">
+                        <div className="text-center py-12 bg-white rounded-lg border border-cyan-100 flex flex-col items-center">
                             <div className="text-5xl text-cyan-900 mx-auto mb-4">
                                 {userRole === 'ATTENDEE' ? <FiUsers /> : <FiUser />}
                             </div>

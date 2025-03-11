@@ -196,16 +196,18 @@ const EventManagement = () => {
 
                         {/* Nút thao tác */}
                         <div className="flex flex-col items-center gap-2">
-                            <button className="p-2 text-cyan-900 hover:bg-cyan-50 rounded-lg" onClick={() => {
-                                if (event.eventStatus == "APPROVED" || event.eventStatus == "FINISHED") {
-                                    toast.error("Cannot update this event");
-                                    return;
-                                }
-                                setSelectedEvent(event);
-                                setUpdateModalOpen(true);
-                            }}>
-                                <FiEdit2 />
-                            </button>
+                            {event.eventStatus !== "APPROVED" &&
+                                <button className="p-2 text-cyan-900 hover:bg-cyan-50 rounded-lg" onClick={() => {
+                                    if (event.eventStatus == "APPROVED" || event.eventStatus == "FINISHED") {
+                                        toast.error("Cannot update this event");
+                                        return;
+                                    }
+                                    setSelectedEvent(event);
+                                    setUpdateModalOpen(true);
+                                }}>
+                                    <FiEdit2 />
+                                </button>}
+
                             {/* check if approved? */}
                             {event.eventStatus == "APPROVED" ?
                                 (<button className="p-2 text-red-500 hover:bg-red-50 rounded-lg" onClick={() => {
