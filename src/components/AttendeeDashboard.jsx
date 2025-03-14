@@ -11,6 +11,7 @@ import { MdRadioButtonUnchecked } from "react-icons/md";
 import { FiInbox } from "react-icons/fi";
 
 import moment from "moment";
+import { NotificationContext } from "@/context/NotificationContext";
 
 
 
@@ -18,8 +19,9 @@ const AttendeeDashboard = ({ setActiveMenu }) => {
     const { info } = useContext(UserContext);
     const [stats, setStats] = useState(null)
     const [upcomingEvents, setUpcomingEvents] = useState([])
-    const [newestNotifications, setNewestNotifications] = useState([])
     const navigate = useNavigate()
+    const { newestNotifications } = useContext(NotificationContext)
+
 
     const stats_icons = [
         FiCalendar,
@@ -59,27 +61,7 @@ const AttendeeDashboard = ({ setActiveMenu }) => {
             }
         }
     };
-    const fetchnewestNotifications = async () => {
-        try {
-            const response = await axiosInstance.get(`/notifications/my-newest-notifications`);
-            if (response.status === 200) {
-                console.log(response.data.result)
-                setNewestNotifications(response.data.result);
-            }
-        } catch (error) {
-            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
-            if (error.response) {
-                const { code } = error.response.data;
-                if (code === 404) {
-                    console.error("No data found.");
-                } else if (code === 401) {
-                    console.error("Unauthorized request.");
-                }
-            } else {
-                console.error("Error:", error.message);
-            }
-        }
-    }
+
     const fetchUpcomingEvent = async () => {
         try {
             const response = await axiosInstance.get(`/events/my-upcoming-events`);
@@ -106,7 +88,7 @@ const AttendeeDashboard = ({ setActiveMenu }) => {
     useEffect(() => {
         fetchStatsData()
         fetchUpcomingEvent()
-        fetchnewestNotifications()
+        // fetchnewestNotifications()
     }, [info])
 
     if (!stats) return
@@ -240,7 +222,8 @@ const AttendeeDashboard = ({ setActiveMenu }) => {
                         </div>
                     ))}
                 </div>
-            </div></div>
+            </div>
+        </div>
     )
 }
 

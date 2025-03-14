@@ -12,11 +12,14 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "@/context/UserContext";
 import confirmToast from "./ui/confirmToast";
 import { toast } from "react-toastify";
+import { FaRegCheckCircle } from "react-icons/fa";
+import { NotificationContext } from "@/context/NotificationContext";
+
 
 const Notifications = () => {
     const { info } = useContext(UserContext);
-    const [notifications, setNotifications] = useState([]);
-    const [filter, setFilter] = useState("all");
+    const { notifications, fetchNotifications, setFilter, filter } = useContext(NotificationContext)
+    // const [notifications, setNotifications] = useState([]);
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -24,18 +27,6 @@ const Notifications = () => {
     const indexOfLast = currentPage * itemsPerPage;
     const indexOfFirst = indexOfLast - itemsPerPage;
     const sliceNotifications = notifications.slice(indexOfFirst, indexOfLast);
-
-    const fetchNotifications = async () => {
-        if (!info) return;
-        try {
-            const response = await axiosInstance.get(`/notifications/mine?filter=${filter}`);
-            if (response.status === 200) {
-                setNotifications(response.data.result);
-            }
-        } catch (error) {
-            console.error("Fetch notifications error:", error);
-        }
-    };
 
     const getNotificationIcon = (type) => {
         switch (type) {
@@ -148,7 +139,10 @@ const Notifications = () => {
 
                                         {/* Content */}
                                         <div className="col-span-7">
-                                            <h3 className="font-semibold text-cyan-900">{notification.title}</h3>
+                                            <div className="flex gap-2 items-center">
+                                                <h3 className="font-semibold text-cyan-900">{notification.title}</h3>
+                                                {!notification.read && <FaRegCheckCircle className="text-base text-red-700" />}
+                                            </div>
                                             <p className="text-gray-600 text-base">{notification.message}</p>
                                         </div>
 

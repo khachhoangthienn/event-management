@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { FiHome, FiHeart, FiCreditCard, FiBell, FiCalendar, FiClock, FiTrendingUp, FiCheckSquare } from "react-icons/fi";
+import React, { useContext, useEffect, useState } from "react";
+import { FiHome, FiHeart, FiCreditCard, FiBell, FiCheckSquare } from "react-icons/fi";
 import OrganizerDashboard from "./OrganizerDashboard";
 import EventManagement from "./EventManagement";
 import Notifications from "./Notification";
+import axiosInstance from "@/axiosConfig";
+import { UserContext } from "@/context/UserContext";
+import "animate.css";
+import { NotificationContext } from "@/context/NotificationContext";
+
 
 const AttendeeHome = () => {
     const [activeMenu, setActiveMenu] = useState("dashboard");
+    const { unreadNotifications } = useContext(NotificationContext)
 
     useEffect(() => {
         scroll(0, 0)
@@ -26,13 +32,18 @@ const AttendeeHome = () => {
                             <button
                                 key={id}
                                 onClick={() => setActiveMenu(id)}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeMenu === id
-                                    ? "bg-cyan-900 text-white shadow-md"
-                                    : "hover:bg-cyan-50 text-gray-600 hover:text-cyan-900"
-                                    }`}
+                                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeMenu === id ? "bg-cyan-900 text-white shadow-md" : "hover:bg-cyan-50 text-gray-600 hover:text-cyan-900"
+                                    } relative`}
                             >
-                                <Icon className={`text-xl ${activeMenu === id ? "text-white" : "text-cyan-900"}`} />
+                                <div className={` ${id === "notifications" && unreadNotifications > 0 ? "animate__animated animate__swing animate__infinite slow-swing" : ""}`}>
+                                    <Icon className={`text-xl ${activeMenu === id ? "text-white" : "text-cyan-900"}`} />
+                                </div>
                                 <span className="font-medium">{label}</span>
+                                {id === "notifications" && unreadNotifications > 0 && (
+                                    <span className=" bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        {unreadNotifications}
+                                    </span>
+                                )}
                             </button>
                         ))}
                     </div>

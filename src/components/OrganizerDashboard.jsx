@@ -2,8 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { FiCalendar, FiUsers, FiDollarSign, FiTrendingUp, FiBarChart2, FiActivity } from "react-icons/fi";
 import { UserContext } from "@/context/UserContext";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { MdWaterfallChart } from "react-icons/md";
+import { MdRadioButtonUnchecked, MdWaterfallChart } from "react-icons/md";
 import axiosInstance from "@/axiosConfig";
+import { FiCheckCircle } from "react-icons/fi";
+import moment from "moment";
+import { NotificationContext } from "@/context/NotificationContext";
+
 
 const OrganizerDashboard = ({ setActiveMenu }) => {
     const { info } = useContext(UserContext);
@@ -11,6 +15,8 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
     const [revenueData, setRevenueData] = useState(null)
     const [stats, setStats] = useState(null)
     const [growthRateData, setGrowthRateData] = useState(null)
+    const { newestNotifications } = useContext(NotificationContext)
+
 
     const stats_icons = [
         FiCalendar,
@@ -18,7 +24,6 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
         FiDollarSign,
         FiTrendingUp
     ];
-
 
     const fetchStatsData = async () => {
         try {
@@ -42,8 +47,6 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
                     };
                 });
                 setGrowthRateData(calculatedGrowthRate);
-
-
             }
         } catch (error) {
             console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
@@ -62,9 +65,9 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
 
     useEffect(() => {
         fetchStatsData()
-    }, [])
+    }, [info])
 
-    if (!monthlyData || !revenueData || !stats || !growthRateData) return
+    if (!monthlyData || !revenueData || !stats || !growthRateData || !newestNotifications) return
     const formattedRevenueData = revenueData.map(item => ({
         ...item,
         revenue: item.revenue / 1000,
@@ -169,13 +172,62 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
                                 dataKey="name"
                             />
                             <YAxis domain={['auto', 'auto']} tickFormatter={(tick) => `${tick}%`} />
-                            <Tooltip formatter={(value) => `${value}%`} labelFormatter={(label) => new Date(label).toLocaleDateString("en-GB")} />
+                            <Tooltip formatter={(value) => `${value}%`} />
                             <Line type="linear" dataKey="growthRate" stroke="black" strokeWidth={2} dot={{ r: 5 }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
             </div>
 
+
+            {/* Newest notifications */}
+            <div className="bg-white rounded-2xl shadow-md border border-cyan-100 p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-cyan-900">Newest notifications</h2>
+                    <button
+                        onClick={() => {
+                            setActiveMenu("notifications");
+                            scroll(0, 0)
+                        }}
+                        className="text-cyan-900 hover:text-cyan-700 font-medium">
+                        View All
+                    </button>
+                </div>
+                <div className="space-y-4">
+                    {newestNotifications.length === 0 && (
+                        <div className="flex flex-col items-center justify-center py-6 text-gray-600">
+                            <FiInbox className="text-5xl text-cyan-900 mb-2" />
+                            <p className="font-semibold text-xl">You're all caught up!</p>
+                            <p className="text-lg text-gray-500 mt-1">
+                                No new notifications. Keep up the great work!
+                            </p>
+                        </div>
+                    )}
+
+                    {newestNotifications.map((notification, index) => (
+                        <div key={notification.notificationId} className="min-h-16 flex items-center border-b border-cyan-100 last:border-0 pb-4 last:pb-0">
+                            {/* Icon trạng thái */}
+                            <div className="w-6 h-6 flex items-center justify-between gap-5">
+                                {notification.read ? (
+                                    <FiCheckCircle className="text-cyan-600 text-lg" />
+                                ) : (
+                                    <MdRadioButtonUnchecked className="text-red-500 text-lg" />
+                                )}
+                            </div>
+
+                            {/* Nội dung thông báo */}
+                            <p className="mx-4 text-gray-700">
+                                <span className="font-semibold">{notification.title}:</span> {notification.message}
+                            </p>
+
+                            {/* Thời gian thông báo */}
+                            <span className="ml-auto text-sm text-gray-500 min-w-16">
+                                {moment(notification.createdAt).fromNow()}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
