@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import {
     FiCreditCard,
     FiCheck,
-    FiX,
     FiBell,
     FiAlertCircle,
     FiEye
@@ -19,6 +18,12 @@ const Notifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState("all");
     const navigate = useNavigate();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const indexOfLast = currentPage * itemsPerPage;
+    const indexOfFirst = indexOfLast - itemsPerPage;
+    const sliceNotifications = notifications.slice(indexOfFirst, indexOfLast);
 
     const fetchNotifications = async () => {
         if (!info) return;
@@ -71,6 +76,7 @@ const Notifications = () => {
 
     useEffect(() => {
         fetchNotifications();
+        setCurrentPage(1)
     }, [filter, info]);
 
     return (
@@ -111,7 +117,7 @@ const Notifications = () => {
 
                 {/* Notifications List */}
                 <div className="space-y-4">
-                    {notifications.length === 0 ? (
+                    {notifications.length === 0 && (
                         <div className="text-center py-12">
                             <FiBell className="text-5xl text-cyan-900 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-cyan-900 mb-2">No Notifications</h3>
@@ -123,53 +129,78 @@ const Notifications = () => {
                                 Explore Events
                             </button>
                         </div>
-                    ) : (
-                        notifications.map((notification) => (
-                            <div
-                                key={notification.notificationId}
-                                className={`
-                                    grid grid-cols-12 items-center gap-4 p-5 rounded-lg text-xl hover:scale-105 transition-all duration-200 cursor-pointer
-                                    ${!notification.read ? 'bg-white border border-cyan-800' : 'bg-gray-50 border border-cyan-100'}
-                                `}
-                            >
-                                {/* Icon */}
-                                <div className="col-span-1 flex justify-center text-2xl">
-                                    {getNotificationIcon(notification.type)}
-                                </div>
-
-                                {/* Content */}
-                                <div className="col-span-7">
-                                    <h3 className="font-semibold text-cyan-900">{notification.title}</h3>
-                                    <p className="text-gray-600 text-base">{notification.message}</p>
-                                </div>
-
-                                {/* Date */}
-                                <div className="col-span-2 text-sm text-gray-500">
-                                    {datimeToEnUS(notification.createdAt)}
-                                </div>
-
-                                {/* Actions */}
-                                <div className="col-span-2 flex justify-end space-x-2">
-                                    {!notification.read && (
-                                        <button
-                                            onClick={() => markAsRead(notification.notificationId)}
-                                            className="text-cyan-700 hover:text-cyan-900 transition"
-                                            title="Mark as read"
-                                        >
-                                            <FiCheck />
-                                        </button>
-                                    )}
-                                    <button
-                                        className="text-cyan-700 hover:text-cyan-900 transition"
-                                        title="View Details"
-                                        onClick={() => navigate(`/events/${notification.eventId}`)}
-                                    >
-                                        <FiEye />
-                                    </button>
-                                </div>
-                            </div>
-                        ))
                     )}
+                    {notifications.length !== 0 && <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-5 min-h-[75vh]">
+                            {
+                                sliceNotifications.map((notification) => (
+                                    <div
+                                        key={notification.notificationId}
+                                        className={`
+                                        grid grid-cols-12 items-center gap-4 p-5 rounded-lg text-xl hover:scale-105 transition-all duration-200 cursor-pointer
+                                        ${!notification.read ? 'bg-white border border-cyan-800' : 'bg-gray-50 border border-cyan-100'}
+                                    `}
+                                    >
+                                        {/* Icon */}
+                                        <div className="col-span-1 flex justify-center text-2xl">
+                                            {getNotificationIcon(notification.type)}
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="col-span-7">
+                                            <h3 className="font-semibold text-cyan-900">{notification.title}</h3>
+                                            <p className="text-gray-600 text-base">{notification.message}</p>
+                                        </div>
+
+                                        {/* Date */}
+                                        <div className="col-span-2 text-sm text-gray-500">
+                                            {datimeToEnUS(notification.createdAt)}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="col-span-2 flex justify-end space-x-2">
+                                            {!notification.read && (
+                                                <button
+                                                    onClick={() => markAsRead(notification.notificationId)}
+                                                    className="text-cyan-700 hover:text-cyan-900 transition"
+                                                    title="Mark as read"
+                                                >
+                                                    <FiCheck />
+                                                </button>
+                                            )}
+                                            <button
+                                                className="text-cyan-700 hover:text-cyan-900 transition"
+                                                title="View Details"
+                                                onClick={() => navigate(`/events/${notification.eventId}`)}
+                                            >
+                                                <FiEye />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                        <div className="flex justify-center mt-4 space-x-2">
+                            <button
+                                className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                Previous
+                            </button>
+
+                            <span className="px-4 py-2">{currentPage}</span>
+
+                            <button
+                                className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                                disabled={indexOfLast >= notifications.length}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>}
+
                 </div>
             </div>
         </div>

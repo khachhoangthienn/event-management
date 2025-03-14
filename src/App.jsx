@@ -12,6 +12,7 @@ import Contact from './page/Contact'
 import Profile from './page/Profile'
 import { ToastContainer } from 'react-toastify'
 import VnPayCallback from './page/VnPayCallback'
+import Chatbot from './components/Chatbot'
 const App = () => {
   return (
     <div>
@@ -29,6 +30,7 @@ const App = () => {
       </Routes>
       <Footer />
       <ToastContainer />
+      <Chatbot />
     </div>
   )
 }

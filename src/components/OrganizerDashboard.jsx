@@ -65,7 +65,6 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
     }, [])
 
     if (!monthlyData || !revenueData || !stats || !growthRateData) return
-
     const formattedRevenueData = revenueData.map(item => ({
         ...item,
         revenue: item.revenue / 1000,

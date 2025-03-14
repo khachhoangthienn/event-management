@@ -43,7 +43,7 @@ const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) =
                     </p>
                 ))}
             </div>
-            <div className={`w-full grid grid-cols-3 gap-10 pt-5 gap-y-6 px-3 sm:px-0 text-gray-800 min-h-[50vh]`}>
+            <div className={`w-full grid grid-cols-3 gap-10 pt-5 gap-y-6 px-3 sm:px-0 text-gray-800 min-h-[42vh]`}>
                 {showEvents.slice(indexPage * number, indexPage * number + number).map((item, index) => (
                     <div onClick={() => navigate(`/events/${item.eventId}`)} className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500 relative group' key={index}>
                         <img className='bg-blue-50 w-full h-60' src={item.photoEvents[0].photoEventId} alt="" />
@@ -69,7 +69,7 @@ const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) =
                     </div>
                 ))}
             </div>
-            {slice == 'slice' && <div className='flex justify-center items-center gap-4' id='nav-event'>
+            {slice == 'slice' && showEvents.length >= number && <div className='flex justify-center items-center gap-4' id='nav-event'>
                 <a onClick={() => { setindexPage(prev => prev == 0 ? prev : prev - 1) }} className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10 hover:bg-cyan-900 hover:text-white'>Previous</a>
                 {indexPage > 0 && <p className='text-cyan-700 text-sm mt-10'>{indexPage}</p>}
                 <p className=' text-center text-cyan-700 text-2xl mt-10 border-2 min-w-10 border-gray-500 rounded-md p-1'>{indexPage + 1}</p>

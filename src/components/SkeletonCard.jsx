@@ -1,13 +1,12 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SkeletonCard() {
     return (
-        <div className="flex flex-col space-y-3">
-            <Skeleton className="h-[125px] w-[250px] rounded-xl p-5" />
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-            </div>
+        <div className="w-full min-h-screen flex flex-col items-center space-y-4 p-6 justify-center">
+            <Skeleton className="h-6 w-1/2 rounded" />
+            <Skeleton className="h-4 w-3/4 rounded" />
+            <Skeleton className="h-4 w-2/3 rounded" />
+            <Skeleton className="h-4 w-1/2 rounded" />
         </div>
-    )
+    );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { FiHeart, FiCalendar, FiMapPin, FiFilter, FiTrash2, FiShare2, FiUser } from "react-icons/fi";
+import { FiHeart, FiCalendar, FiMapPin, FiTrash2, FiUser } from "react-icons/fi";
 import axiosInstance from "@/axiosConfig";
 import { datimeToEnUS } from "@/utils";
 import { useNavigate } from "react-router-dom";
@@ -14,8 +14,11 @@ const FavoriteEvents = () => {
     const [myFavoriteEvents, setMyFavoriteEvents] = useState([]);
     const navigate = useNavigate()
 
-
-    const favoriteEvents = myFavoriteEvents.slice(0, 3);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+    const indexOfLast = currentPage * itemsPerPage;
+    const indexOfFirst = indexOfLast - itemsPerPage;
+    const favoriteEvents = myFavoriteEvents.slice(indexOfFirst, indexOfLast);
 
     const fetchFavouriteEvents = async () => {
         if (!info) return;
@@ -101,63 +104,89 @@ const FavoriteEvents = () => {
                 </div>
 
                 {/* Events Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {favoriteEvents.map((favourite) => (
-                        <div key={favourite.event.eventId} className="bg-white rounded-2xl shadow-md overflow-hidden border border-cyan-100 group w-full mx-auto"> {/* Đã loại bỏ w-96 */}
-                            {/* Event Image */}
-                            <div className="relative">
-                                <img
-                                    src={favourite.event.photoEvents[0].photoEventId}
-                                    alt={favourite.event.name}
-                                    className="w-full h-50 object-cover"
-                                />
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    <button className="p-3 bg-white rounded-full text-red-500 shadow-lg hover:bg-red-50 transition-colors">
-                                        <FiTrash2 className="text-xl" onClick={() => handleFavourite(favourite.event.eventId)} />
-                                    </button>
-                                </div>
-                                <div className="absolute bottom-4 left-4 bg-cyan-900 text-white px-4 py-2 rounded-full text-base">
-                                    {favourite.event.types[0].typeName}
-                                </div>
-                            </div>
+                <div className="flex flex-col md:flex-col flex-wrap gap-6 justify-between">
+                    <div className="flex-col flex gap-5 min-h-[85vh]">
+                        {favoriteEvents.map((favourite) => (
+                            <div key={favourite.event.eventId} className="bg-white rounded-2xl shadow-md overflow-hidden border border-cyan-100 group w-full flex flex-row mx-auto">
 
-                            {/* Event Details */}
-                            <div className="px-8 py-2">
-                                <div className="mb-6">
-                                    <h3 className="text-2xl font-semibold text-cyan-900 mb-2">{favourite.event.eventName}</h3>
-                                    <div className="flex items-center text-gray-600">
-                                        <FiUser className="mr-2" />
-                                        <span>By {favourite.event.user.firstName} {favourite.event.user.lastName}</span>
+                                {/* Event Image */}
+                                <div className="relative w-1/4">
+                                    <img
+                                        src={favourite.event.photoEvents[0].photoEventId}
+                                        alt={favourite.event.name}
+                                        className="w-full aspect-square object-cover"
+                                    />
+                                    <div className="absolute top-4 right-4 flex gap-2">
+                                        <button className="p-3 bg-white rounded-full text-red-500 shadow-lg hover:bg-red-50 transition-colors">
+                                            <FiTrash2 className="text-base" onClick={() => handleFavourite(favourite.event.eventId)} />
+                                        </button>
                                     </div>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex items-center text-gray-600">
-                                        <FiCalendar className="mr-2 text-green-700" />
-                                        <span>Start: {datimeToEnUS(favourite.event.startTime)}</span>
-                                    </div>
-                                    <div className="flex items-center text-gray-600">
-                                        <FiCalendar className="mr-2" />
-                                        <span>End: {datimeToEnUS(favourite.event.endTime)}</span>
-                                    </div>
-                                    <div className="flex items-center text-gray-600">
-                                        <FiMapPin className="mr-2" />
-                                        <span>{favourite.event.eventLocation}</span>
+                                    <div className="absolute bottom-4 left-4 bg-cyan-900 text-white px-4 py-2 rounded-full text-sm">
+                                        {favourite.event.types[0].typeName}
                                     </div>
                                 </div>
 
-                                <div className="my-2 flex items-center justify-between">
-                                    <span className="px-4 py-2 bg-green-100 text-green-700 rounded-full text-base">
-                                        {favourite.event.availableTickets} seats available
-                                    </span>
-                                    <button onClick={() => navigate(`/events/${favourite.event.eventId}`)}
-                                        className="px-5 py-3 bg-cyan-900 text-white rounded-lg hover:bg-cyan-800 transition-colors">
-                                        Details
-                                    </button>
+                                {/* Event Details */}
+                                <div className="px-8 py-4 flex flex-col justify-between w-3/4">
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-cyan-900 mb-2">{favourite.event.eventName}</h3>
+                                        <div className="flex items-center text-gray-600">
+                                            <FiUser className="mr-2" />
+                                            <span>By {favourite.event.user.firstName} {favourite.event.user.lastName}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center text-gray-600">
+                                            <FiCalendar className="mr-2 text-green-700" />
+                                            <span>Start: {datimeToEnUS(favourite.event.startTime)}</span>
+                                        </div>
+                                        <div className="flex items-center text-gray-600">
+                                            <FiCalendar className="mr-2" />
+                                            <span>End: {datimeToEnUS(favourite.event.endTime)}</span>
+                                        </div>
+                                        <div className="flex items-center text-gray-600">
+                                            <FiMapPin className="mr-2" />
+                                            <span>{favourite.event.eventLocation}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <span className="px-4 py-2 bg-green-100 text-green-700 rounded-full text-base">
+                                            {favourite.event.availableTickets} seats available
+                                        </span>
+                                        <button onClick={() => navigate(`/events/${favourite.event.eventId}`)}
+                                            className="px-5 py-3 bg-cyan-900 text-white rounded-lg hover:bg-cyan-800 transition-colors">
+                                            Details
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                    {/* pagination */}
+                    <div className="flex justify-center mt-4 space-x-2">
+                        <button
+                            className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+
+                        <span className="px-4 py-2">{currentPage}</span>
+
+                        <button
+                            className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={indexOfLast >= myFavoriteEvents.length}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
+
+
 
                 {/* Empty State */}
                 {favoriteEvents.length === 0 && (

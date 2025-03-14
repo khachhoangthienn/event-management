@@ -9,7 +9,8 @@ import axiosInstance from "@/axiosConfig";
 import { formDataInstance } from "@/axiosConfig";
 import { toast } from "react-toastify";
 import { LuLoaderCircle } from "react-icons/lu";
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const UserProfile = () => {
 
@@ -274,7 +275,6 @@ const UserProfile = () => {
                         {/* Details Section */}
                         <div className="md:w-2/3 p-8">
                             <h3 className="text-3xl font-bold text-cyan-800 mb-6 border-b-2 border-cyan-500 pb-2">Personal Information</h3>
-
                             <div className="grid gap-6">
                                 {[
                                     {
@@ -325,20 +325,39 @@ const UserProfile = () => {
                                                         <option value="true">Men</option>
                                                         <option value="false">Women</option>
                                                     </select>
-                                                ) : (name !== 'email' ? (<input
-                                                    required
-                                                    type="text"
-                                                    placeholder={name === 'birth' ? 'YYYY-MM-DD' : 'Enter your address (e.g., 123 Main Street, New York)'}
-                                                    name={name}
-                                                    value={editedInfo[name] ? editedInfo[name] : ''}
-                                                    onChange={handleInputChange}
-                                                    className="w-full border-b-2 border-cyan-500 focus:outline-none"
-                                                />) : (
+                                                ) : name === 'birth' ? (
+                                                    <div>
+                                                        <DatePicker
+                                                            selected={editedInfo[name] ? new Date(editedInfo[name]) : null}
+                                                            onChange={(date) =>
+                                                                setEditedInfo(prev => ({
+                                                                    ...prev,
+                                                                    [name]: date ? date.toISOString().split('T')[0] : ''
+                                                                }))
+                                                            }
+                                                            className="w-full border-cyan-500 focus:outline-none"
+                                                            dateFormat="yyyy-MM-dd"
+                                                            placeholderText="Select Date"
+                                                        />
+                                                        <p className="w-full border-b-2 border-cyan-500 focus:outline-none"
+                                                        ></p>
+                                                    </div>
+
+                                                ) : (name !== 'email' ? (
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        placeholder={name === 'birth' ? 'YYYY-MM-DD' : 'Enter your address (e.g., 123 Main Street, New York)'}
+                                                        name={name}
+                                                        value={editedInfo[name] ? editedInfo[name] : ''}
+                                                        onChange={handleInputChange}
+                                                        className="w-full border-b-2 border-cyan-500 focus:outline-none"
+                                                    />
+                                                ) : (
                                                     <p className="text-gray-600">
                                                         {info[name]}
                                                     </p>
                                                 )
-
                                                 )
                                             ) : (
                                                 <p className="text-gray-600">
@@ -353,6 +372,94 @@ const UserProfile = () => {
                                     </div>
                                 ))}
                             </div>
+                            {/* <div className="grid gap-6">
+                                {[
+                                    {
+                                        name: 'email',
+                                        Icon: FaEnvelope,
+                                        title: "Email",
+                                    },
+                                    {
+                                        name: 'birth',
+                                        Icon: FaBirthdayCake,
+                                        title: "Date of Birth",
+                                    },
+                                    {
+                                        name: 'address',
+                                        Icon: FaHome,
+                                        title: "Address",
+                                    },
+                                    {
+                                        name: 'gender',
+                                        Icon: FaTransgender,
+                                        title: "Gender",
+                                    }
+                                ].map(({ name, Icon, title }, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-white border border-cyan-100 rounded-lg p-4 hover:shadow-md transition-shadow flex items-center"
+                                    >
+                                        <div className="mr-4 text-cyan-600">
+                                            <Icon size={24} />
+                                        </div>
+                                        <div className="flex-grow">
+                                            <h4 className="text-lg font-semibold text-cyan-800">{title}</h4>
+                                            {isEditMode ? (
+                                                name === 'gender' ? (
+                                                    <select
+                                                        name={name}
+                                                        value={editedInfo[name] === true ? 'true' : 'false'}
+                                                        onChange={(e) =>
+                                                            handleInputChange({
+                                                                target: {
+                                                                    name: e.target.name,
+                                                                    value: e.target.value === 'true',
+                                                                },
+                                                            })
+                                                        }
+                                                        className="w-full border-b-2 border-cyan-500 focus:outline-none"
+                                                    >
+                                                        <option value="true">Men</option>
+                                                        <option value="false">Women</option>
+                                                    </select>
+                                                ) : name === 'birth' ? (
+                                                    <input
+                                                        required
+                                                        type="date" // Thay đổi loại thành "date" cho trường ngày sinh
+                                                        name={name}
+                                                        value={editedInfo[name] ? editedInfo[name] : ''}
+                                                        onChange={handleInputChange}
+                                                        className="w-full border-b-2 border-cyan-500 focus:outline-none"
+                                                    />
+                                                ) : (name !== 'email' ? (
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        placeholder={name === 'birth' ? 'YYYY-MM-DD' : 'Enter your address (e.g., 123 Main Street, New York)'}
+                                                        name={name}
+                                                        value={editedInfo[name] ? editedInfo[name] : ''}
+                                                        onChange={handleInputChange}
+                                                        className="w-full border-b-2 border-cyan-500 focus:outline-none"
+                                                    />
+                                                ) : (
+                                                    <p className="text-gray-600">
+                                                        {info[name]}
+                                                    </p>
+                                                )
+                                                )
+                                            ) : (
+                                                <p className="text-gray-600">
+                                                    {name === 'gender'
+                                                        ? info.gender === true
+                                                            ? "Men"
+                                                            : "Women"
+                                                        : info[name]}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div> */}
                         </div>
                     </div>
                 </div>

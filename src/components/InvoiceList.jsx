@@ -1,7 +1,7 @@
 import axiosInstance from '@/axiosConfig';
 import { UserContext } from '@/context/UserContext';
 import React, { useState, useEffect, useContext } from 'react';
-import { FiCalendar, FiCreditCard, FiDollarSign, FiEye, FiFilter, FiUser, FiMapPin, FiPackage, FiX } from 'react-icons/fi';
+import { FiCalendar, FiCreditCard, FiDollarSign, FiEye, FiMapPin, FiPackage, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const InvoiceList = () => {
@@ -12,6 +12,7 @@ const InvoiceList = () => {
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const navigate = useNavigate();
 
+    // pagination
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
     const indexOfLast = currentPage * itemsPerPage;

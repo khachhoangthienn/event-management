@@ -1,5 +1,4 @@
 import { SkeletonCard } from '@/components/SkeletonCard';
-import { AppContext } from '@/context/AppContext';
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FaHeart } from "react-icons/fa6";
@@ -15,11 +14,9 @@ import { GiPublicSpeaker } from "react-icons/gi";
 import { IoMdSend } from "react-icons/io";
 
 import ReactStars from "react-stars";
-import { Button } from './ui/button';
 import axiosInstance, { axiosPublic } from '@/axiosConfig';
 import { datimeToEnUS } from '@/utils';
 import { UserContext } from '@/context/UserContext';
-import { comment } from 'postcss';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -34,6 +31,7 @@ const Details = () => {
     // Set input of comment by onChange
     const [inputComment, setInputComment] = useState("")
     const [rating, setRating] = useState(0)
+    const [countRating, setCountRating] = useState(0)
     // favourite
     const [isFavourite, setIsFavourite] = useState(false)
 
@@ -110,6 +108,13 @@ const Details = () => {
             if (response.status === 200) {
                 setComments(response.data.result);
                 console.log(response.data.result);
+                setCountRating(response.data.result.length)
+                const averageRating =
+                    comments.length > 0
+                        ? comments.reduce((sum, review) => sum + review.rating, 0) / comments.length
+                        : 0;
+
+                setRating(parseFloat(averageRating.toFixed(2)));
             }
         } catch (error) {
             console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
@@ -195,8 +200,8 @@ const Details = () => {
                             </div>
                         </div>
                         <div className='flex flex-col items-center'>
-                            <ReactStars count={5} size={26} value={4} edit={false} />
-                            <p>500 Ratings</p>
+                            <ReactStars count={5} size={26} value={rating} edit={false} />
+                            <p>{countRating} Ratings</p>
                         </div>
                     </div>
 
@@ -224,8 +229,8 @@ const Details = () => {
                             <p>Comment</p>
                         </div>
                         <div className='absolute flex-row gap-4 w-auto h-auto py-2 right-0 top-0 flex justify-center items-center text-cyan-900 text-sm'>
-                            <p>500 Ratings</p>
-                            <ReactStars count={5} size={26} value={4} edit={false} />
+                            <p>{countRating} Ratings</p>
+                            <ReactStars count={5} size={26} value={rating} edit={false} />
                         </div>
 
                         <div className='flex flex-col py-20 text-justify gap-5'>
@@ -305,15 +310,30 @@ const Details = () => {
                     {/* -----------------> first component */}
 
                     <div className='border rounded-lg border-gray-200 shadow-2xl relative h-fit'>
-                        {isFavourite ?
-                            (<div onClick={() => handleFavourite()} className='absolute gap-4 bg-gray-400 rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl'>
-                                <MdOutlineRemoveCircle />
-                                <p>Unfavourite</p>
-                            </div>) :
-                            (<div onClick={() => handleFavourite()} className='absolute gap-4 bg-pink-400 border rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-gray-100 font-semibold text-xl'>
-                                <FaHeart />
-                                <p>Favourite</p>
-                            </div>)}
+                        {info && info.role == "ATTENDEE" ? (
+                            isFavourite ? (
+                                <div
+                                    onClick={() => handleFavourite()}
+                                    className='absolute gap-4 bg-gray-400 rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-white font-semibold text-xl'
+                                >
+                                    <MdOutlineRemoveCircle />
+                                    <p>Unfavourite</p>
+                                </div>
+                            ) : (
+                                <div
+                                    onClick={() => handleFavourite()}
+                                    className='absolute gap-4 bg-pink-400 border rounded-tr-2xl hover:scale-x-105 cursor-pointer transition-all duration-300 origin-left rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-gray-100 font-semibold text-xl'
+                                >
+                                    <FaHeart />
+                                    <p>Favourite</p>
+                                </div>
+                            )
+                        ) : (
+                            <div className='absolute gap-4 bg-gray-500 border rounded-tr-2xl rounded-br-2xl w-1/2 h-14 left-0 top-8 flex justify-center items-center text-gray-100 font-semibold text-xl'>
+                                <p>The information</p>
+                            </div>
+                        )}
+
                         <div className='w-full flex-row md:flex-col pt-28 text-left justify-start px-5 min-h-80 text-xl text-cyan-900 pb-10 md:pb-0'>
                             <div className='flex flex-col gap-5'>
                                 {/* content here */}
@@ -355,7 +375,13 @@ const Details = () => {
                                     <p className='text-2xl'>available now!</p>
                                 </div>
                                 {/* {eventInfo.endTime < new Date() ? ( */}
-                                <div onClick={() => navigate(`pricing-plan`, { state: { eventInfo } })} className='gap-4 bg-red-700 rounded-tr-2xl hover:scale-110 cursor-pointer transition-all duration-300 rounded-2xl px-4 min-w-fit py-5 mb-7 flex justify-center items-center text-white font-semibold text-3xl'>
+                                <div onClick={() => {
+                                    if (info && info.role == "ATTENDEE") {
+                                        navigate(`pricing-plan`, { state: { eventInfo } })
+                                    } else {
+                                        toast.warning("Please log in with an attendee account to buy tickets!", { autoClose: 1700 });
+                                    }
+                                }} className='gap-4 bg-red-700 rounded-tr-2xl hover:scale-110 cursor-pointer transition-all duration-300 rounded-2xl px-4 min-w-fit py-5 mb-7 flex justify-center items-center text-white font-semibold text-3xl'>
                                     <LuTicketCheck />
                                     <p>Buy ticket now!</p>
                                 </div>

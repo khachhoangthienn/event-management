@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "eventmanagementagent-mwaq",
+  "private_key_id": "018466aabe4d7508f081aa8a0846300a6d47ef88",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCToZY4urhetmDC\njM7pSzD2WKYaZPwEdfvgDZ+Sb2anullnCQoOLChSdIoUmwpxEQIM7j/d8vFfZ0lV\n8Tw925kWy2KspEME0ciaot6jb0bfmS9UslQ6EzWDQlpO1NKJK4L/yb6TmCeQ9lti\nUdrf00w18mfx5Lm6oRpEzWDpa40AlhOLRd8+n783hx5z4HENnSBpCPfkWdUouNQT\nYLJhWIUgNaQ1fVVHAJ9XatzpJf3rI7mIURq+LxdwzK955dyGYnHJ8VWQsbyWSgrP\nd36qKoYat+Qn2RLKhE+H1x6kjTjnANNIz3wBdzlPtkLHS/5NWPyZ9wIuRcbpFeg7\nsJPiXmN5AgMBAAECggEAB33Og04xUygO0KyHxuWghE2zDxmTAtBwYbobP/lsdIQz\nq3N1WcsCmE2O4LUN4ncuGxUfc04z0qcpfOWXDJ4HPpV/SjqzJmxVUUiEwvcfefL6\naII8nS5Sm7irH78zuE93kC6O/8sbreLceAimkk9U+ZNVlDwqsxZgAIAKBApHv1Dq\nid2amYl+k70tW67DJxBXQGTkH/FCuGNIFU+odHdkxgEc5q/tqGa9XK/pmrO/OjqF\nQYBT3h6jWBZKe/2Yb6UoaZ3s3xZm+e8+obcZEi1og32rn8fKY5Z+zaOgGXmM4Tgh\ny+/QvrjhVGKsbgsbuMfB7SkItA3l0VuvpO7I8o8SgQKBgQDKNvrakDACERDAPdYd\nE/pBJ3n/E0XsWYjXq8Q9HegzWhOxp0LfUpqjkEInxg8VHQvrrGK/BbsyOlgw4RG5\nEdApGLMjgVZ1JB5kSy1lPKdgu+phBHd2OkAaTRbkgOmR+Z2I4v7FBl4lw74o6jRH\ni6RXk4VsAf1pvqh0yaW7ddXL+QKBgQC65fQOFzmktgQzv8/lKNCLPFn7Ek5j+2He\ntA0OcKpVMCZSwUclK3SFjhPy/VzKppp5uuauISlfsj6auuKin652jNNZ2NXGah5x\nkY9i6TU6wjwNruQpsV3DbShhFRaope6enbFVDWPMfDefQmvvsMMv60h7MexTyw+k\nuLQ5ugAzgQKBgEvwwdx68cyU5BmOH27kJcN6M9KbRlMwfLeiBhx9sso2Ndct3WtI\n9lIexvlw5BEly2hCYQMj/90pFB2nKKS8D9SfNgdLd1Ces9sucGnokWM+rxKoPsTj\ns1ctRD+kOhNcDtFtjggoEAtWq39qFSAZTSqmeCDLzoN72n+hiuAPrK7hAoGANDJK\nkbDc0WpgDA/SwN5AN9KYEq2PJQ8syySfzNucRoRW/5+o/fF/7li6q48k3hffZoXT\nLOhoBKjkIRR2fRJ5h/RWhm4vbeVvMSqE0AvvaMScPvoMELTPSefvcgWQuXL2DGhg\nAS/nIlHCuwCy4lMMgBKGwJk1tkUszkUjWEfhDIECgYEAoUPj28tmrwrbRaimymAa\nwlXqOFlGjFFHZMLETAFicfqqIT9kVTrhwyR91Tt3X8wqeBRz5eiScKqSKS2Ps+0B\nU57T8lbgjRbwS+e8xS4B1R4FlHio7T45aL0ZrTH3JETY0fFki6Zulp9AFQyJSIvQ\nnXnMg9JlMJIgxDSOou+rvcM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "chatbot-event-management-api@eventmanagementagent-mwaq.iam.gserviceaccount.com",
+  "client_id": "107862580503365900085",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/chatbot-event-management-api%40eventmanagementagent-mwaq.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

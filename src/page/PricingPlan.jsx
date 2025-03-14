@@ -78,6 +78,17 @@ const PricingPlan = () => {
         }
     };
 
+    useEffect(() => {
+        const hasReloaded = localStorage.getItem("hasReloaded");
+
+        if (!hasReloaded) {
+            localStorage.setItem("hasReloaded", "true");
+            window.location.reload();
+        } else {
+            localStorage.removeItem("hasReloaded");
+        }
+    }, []);
+
     if (!eventInfo) return <SkeletonCard />
 
     return (
@@ -93,7 +104,7 @@ const PricingPlan = () => {
                 <div className='flex flex-row gap-10 justify-center'>
 
                     {eventInfo.packagePrices.map((item, index) => (
-                        <div key={item.packageId} className='border rounded-lg border-x-gray-300 bg-slate-50 relative min-h-[200px] my-10 min-w-96'>
+                        <div key={item.packageId} className='border rounded-lg border-x-gray-300 bg-slate-50 relative min-h-[px] my-10 min-w-96 flex flex-col justify-between'>
                             <div className='flex text-orange-600 absolute right-2 top-1 gap-2'>
                                 <FaStar size={25} />
                             </div>
@@ -113,6 +124,8 @@ const PricingPlan = () => {
                                         <p>{benefit.benefitDescription}</p>
                                     </div>
                                 ))}
+                            </div>
+                            <div className='flex flex-col gap-3 mx-4 mb-3'>
                                 <div className='flex items-center gap-2 pt-3'>
                                     <p className='text-lg font-semibold text-gray-600'>Tickets Remaining:</p>
                                     <span className={`px-3 py-1 rounded-full text-white font-bold ${item.availableTickets === 0 ? 'bg-red-600' : 'bg-green-600'}`}>
@@ -122,7 +135,7 @@ const PricingPlan = () => {
 
                                 <ReactCardFlip
                                     key={item.packageId}
-                                    isFlipped={selectedPack === item.packageId} // Chỉ mở nếu được chọn
+                                    isFlipped={selectedPack === item.packageId}
                                     flipDirection="vertical"
                                 >
                                     {/* Mặt trước */}
@@ -168,7 +181,6 @@ const PricingPlan = () => {
                                         </div>
                                     </div>
                                 </ReactCardFlip>
-
                             </div>
                         </div>
                     ))}
