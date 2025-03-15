@@ -9,6 +9,7 @@ import {
     FiPieChart,
     FiTrendingUp
 } from "react-icons/fi";
+import { FaRegMoneyBillAlt } from "react-icons/fa";
 import { MdEventNote, MdPayment, MdNotifications } from "react-icons/md";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
 import axiosInstance, { axiosPublic } from "@/axiosConfig";
@@ -36,7 +37,7 @@ const AdminDashboard = ({ setActiveMenu }) => {
     const stats_icons = [
         FiUsers,
         FiCalendar,
-        FiDollarSign,
+        FaRegMoneyBillAlt,
         FiStar,
         MdEventNote,
         MdPayment,

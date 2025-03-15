@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FiCalendar, FiUsers, FiDollarSign, FiTrendingUp, FiBarChart2, FiActivity } from "react-icons/fi";
+import { FiCalendar, FiUsers, FiDollarSign, FiTrendingUp, FiBarChart2, FiActivity, FiInbox } from "react-icons/fi";
 import { UserContext } from "@/context/UserContext";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { MdRadioButtonUnchecked, MdWaterfallChart } from "react-icons/md";
@@ -7,6 +7,8 @@ import axiosInstance from "@/axiosConfig";
 import { FiCheckCircle } from "react-icons/fi";
 import moment from "moment";
 import { NotificationContext } from "@/context/NotificationContext";
+import { FaRegMoneyBillAlt } from "react-icons/fa";
+
 
 
 const OrganizerDashboard = ({ setActiveMenu }) => {
@@ -21,7 +23,7 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
     const stats_icons = [
         FiCalendar,
         FiUsers,
-        FiDollarSign,
+        FaRegMoneyBillAlt,
         FiTrendingUp
     ];
 

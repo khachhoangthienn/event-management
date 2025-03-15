@@ -4,11 +4,13 @@ import axiosPublic, { axiosInstance } from "@/axiosConfig";
 import { UserContext } from "./UserContext";
 
 export const EventContext = createContext();
+
 const EventContextProvider = (props) => {
     const [types, setTypes] = useState([])
     const [events, setEvents] = useState([])
     const [popularEvents, setPopularEvents] = useState([])
     const [topEvents, setTopEvents] = useState([])
+    const { info } = useContext(UserContext)
 
     const fetchTypes = async () => {
         try {
@@ -75,7 +77,6 @@ const EventContextProvider = (props) => {
     };
 
     const [recommendEvent, setRecommendEvents] = useState([])
-    const { info } = useContext(UserContext);
 
     const fetchRecommendEvents = async () => {
         if (!info) return

@@ -19,27 +19,12 @@ const Navbar = () => {
     }, []);
 
     const logOut = async () => {
-        try {
-            const authToken = localStorage.getItem("authToken");
-            const response = await axiosPublic.post("/auth/logout", {
-                token: authToken,
-            });
-            if (response.status === 200) {
-                localStorage.removeItem("userInfo");
-                localStorage.removeItem("authToken");
-                setInfo(null);
-                navigate(`/login`);
-                toast.success("Logout successful!")
-            }
-        } catch (error) {
-            if (error.response) {
-                const { code, message } = error.response.data;
-            } else {
-                console.error("Error:", error.message);
-                alert("Login failed: " + error.message);
-            }
-        }
-    };
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("authToken");
+        setInfo(null);
+        navigate(`/login`);
+        toast.success("Logout successful!")
+    }
 
     return (
         <div className='absolute top-0 left-0 w-full z-10 text-lg'>

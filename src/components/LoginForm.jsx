@@ -91,7 +91,12 @@ const LoginForm = () => {
         }
     };
 
-    if (info) navigate("/")
+    useEffect(() => {
+        if (info) {
+            navigate("/");
+        }
+    }, []);
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-0 border border-gray-300 min-w-96 py-4 px-5 rounded-xl bg-white relative shadow-xl">
 
@@ -119,7 +124,8 @@ const LoginForm = () => {
                     <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
                     </div>
-                    <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
+                    <Input id="password" type="password" autoComplete="current-password"
+                        required onChange={(e) => setPassword(e.target.value)} />
                 </div>
 
                 {isRegister && <div>

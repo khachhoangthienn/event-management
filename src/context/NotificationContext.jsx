@@ -38,6 +38,7 @@ const NotificationContextProvider = (props) => {
     };
 
     const fetchnewestNotifications = async () => {
+        if (!info) return;
         try {
             const response = await axiosInstance.get(`/notifications/my-newest-notifications`);
             if (response.status === 200) {

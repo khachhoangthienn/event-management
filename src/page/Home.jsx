@@ -11,6 +11,7 @@ const Home = () => {
     const { info } = useContext(UserContext);
 
     if (!info) return (<HomeLogin />)
+
     if (info.role == "ATTENDEE") return (
         <div>
             <HeaderUser type={`Attendee – Join exciting events!`} />

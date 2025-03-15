@@ -72,10 +72,10 @@ axiosInstance.interceptors.response.use(
       } catch (error) {
         localStorage.removeItem("authToken");
         localStorage.removeItem("userInfo");
-        // toast.error("Session expired. Please login again.", {
-        //   autoClose: 3000,
-        //   hideProgressBar: false,
-        // });
+        toast.error("Session expired. Please login again.", {
+          autoClose: 3000,
+          hideProgressBar: false,
+        });
 
         setTimeout(() => {
           window.location.href = "/login";
