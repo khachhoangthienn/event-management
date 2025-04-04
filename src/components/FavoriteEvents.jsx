@@ -105,7 +105,7 @@ const FavoriteEvents = () => {
 
                 {/* Events Grid */}
                 <div className="flex flex-col md:flex-col flex-wrap gap-6 justify-between">
-                    <div className="flex-col flex gap-5 min-h-[85vh]">
+                    {favoriteEvents.length !== 0 && (<div className="flex-col flex gap-5 min-h-[85vh]">
                         {favoriteEvents.map((favourite) => (
                             <div key={favourite.event.eventId} className="bg-white rounded-2xl shadow-md overflow-hidden border border-cyan-100 group w-full flex flex-row mx-auto">
 
@@ -163,9 +163,10 @@ const FavoriteEvents = () => {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </div>)}
+
                     {/* pagination */}
-                    <div className="flex justify-center mt-4 space-x-2">
+                    {favoriteEvents.length !== 0 && (<div className="flex justify-center mt-4 space-x-2">
                         <button
                             className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
                             onClick={() => setCurrentPage(currentPage - 1)}
@@ -183,7 +184,9 @@ const FavoriteEvents = () => {
                         >
                             Next
                         </button>
-                    </div>
+                    </div>)}
+
+
                 </div>
 
 

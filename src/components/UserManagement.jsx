@@ -3,7 +3,12 @@ import { FiUser, FiUsers, FiCalendar, FiMail, FiMapPin, FiSearch, FiFilter, FiEd
 import { axiosPublic } from '@/axiosConfig';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from 'react-toastify';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReactCardFlip from 'react-card-flip';
+import { TbLockSquareRounded } from "react-icons/tb";
+import { TbLockCheck } from "react-icons/tb";
+import confirmToast from './ui/confirmToast';
+
+
 
 const AdminUserManagement = () => {
     const [userRole, setUserRole] = useState('ATTENDEE');
@@ -17,10 +22,13 @@ const AdminUserManagement = () => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
+    const [isActiveUser, setIsActiveUser] = useState(true)
+
     const usersPerPage = 5;
     const indexOfLastUser = currentPage * usersPerPage;
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
 
+    console.log(isActiveUser)
     // Filter users by search term
     const filteredUsers = users.filter(user =>
         (user.firstName && user.firstName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -33,7 +41,7 @@ const AdminUserManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axiosPublic.get(`/users/get-by-role?role=${userRole}`);
+            const response = await axiosPublic.get(`/users/get-by-role?role=${userRole}&active=${isActiveUser}`);
             if (response.status === 200) {
                 setUsers(response.data.result);
             }
@@ -52,9 +60,31 @@ const AdminUserManagement = () => {
         }
     };
 
+    const ChangeStatusUser = async (userId) => {
+        try {
+            const response = await axiosPublic.put(`/users/change-lock/${userId}`);
+            if (response.status === 200) {
+                fetchUsers();
+                toast.success("User status updated successfully!", { autoClose: 1700 });
+            }
+        } catch (error) {
+            console.log("Error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    }
+
     useEffect(() => {
         fetchUsers();
-    }, [userRole]);
+    }, [userRole, isActiveUser]);
 
     const handleUserClick = (user) => {
         setSelectedUser(user);
@@ -104,7 +134,7 @@ const AdminUserManagement = () => {
     };
 
     const formatDate = (dateString) => {
-        if (!dateString) return "N/A";
+        if (!dateString) return "Not provided";
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -144,6 +174,22 @@ const AdminUserManagement = () => {
                             <FiUser className="inline-block mr-2" />
                             Organizers
                         </button>
+                        <ReactCardFlip
+                            isFlipped={isActiveUser}
+                            flipDirection="horizontal"
+                        >
+
+                            <div
+                                onClick={() => setIsActiveUser(true)}
+                                className='cursor-pointer flex font-semibold text items-center justify-end px-4 py-2 rounded-md border-2 border-red-600 text-red-600 text-lg'>
+                                Blocked</div>
+                            <div
+                                onClick={() => setIsActiveUser(false)}
+                                className='cursor-pointer flex font-semibold text items-center justify-end px-4 py-2 rounded-md border-2 border-cyan-900 text-cyan-900 text-lg'>
+                                Active</div>
+                        </ReactCardFlip>
+
+
                     </div>
 
                 </div>
@@ -192,26 +238,56 @@ const AdminUserManagement = () => {
                                                     {user.events?.length || 0} Events
                                                 </span> */}
                                             </div>
-                                            <h3 className="text-xl font-semibold text-cyan-900 mb-1">{user.firstName} {user.lastName}</h3>
+                                            <h3 className="text-xl font-semibold text-cyan-900 mb-1">
+                                                {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "[No name]"}
+                                            </h3>
                                             <div className="flex items-center text-gray-600 mb-1">
                                                 <FiMail className="mr-2" />
                                                 <span>{user.email}</span>
                                             </div>
                                         </div>
-                                        {/* <div className="flex gap-2 mt-3 md:mt-0">
+                                        {isActiveUser ? (<div className="flex h-fit bg-red-500">
                                             <button
-                                                onClick={(e) => handleEditClick(e, user)}
-                                                className="p-2 bg-cyan-50 text-cyan-900 rounded-lg hover:bg-cyan-100"
+                                                onClick={(e) => {
+                                                    confirmToast("Are you sure you want to block this user?", () => {
+                                                        ChangeStatusUser(user.userId)
+                                                    });
+                                                    e.stopPropagation();
+                                                }}
+                                                className="flex gap-2 items-center p-2 bg-cyan-50 text-red-600 rounded-lg hover:bg-gray-300 duration-300"
                                             >
-                                                <FiEdit />
+                                                <TbLockSquareRounded />
+                                                Block user
                                             </button>
-                                            <button
+                                            {/* <button
                                                 onClick={(e) => handleDeleteClick(e, user)}
                                                 className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
                                             >
                                                 <FiTrash2 />
-                                            </button>
-                                        </div> */}
+                                            </button> */}
+                                        </div>) : (
+                                            <div className="flex h-fit bg-cyan-900">
+                                                <button
+                                                    onClick={(e) => {
+                                                        confirmToast("Are you sure you want to unblock this user?", () => {
+                                                            ChangeStatusUser(user.userId)
+                                                        });
+                                                        e.stopPropagation();
+                                                    }}
+                                                    className="flex gap-2 items-center p-2 bg-cyan-50 text-cyan-900 rounded-lg hover:bg-gray-300 duration-300"
+                                                >
+                                                    <TbLockCheck />
+                                                    Unblock User
+                                                </button>
+                                                {/* <button
+                                                onClick={(e) => handleDeleteClick(e, user)}
+                                                className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                                            >
+                                                <FiTrash2 />
+                                            </button> */}
+                                            </div>
+                                        )}
+
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
@@ -278,7 +354,7 @@ const AdminUserManagement = () => {
 
             {/* // User Details Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-6 rounded-lg shadow-lg bg-white">
+                <DialogContent className="max-w-3xl max-h-[200vh] overflow-y-auto p-6 rounded-lg shadow-lg bg-white">
                     {selectedUser && (
                         <>
                             <DialogHeader>
@@ -287,7 +363,7 @@ const AdminUserManagement = () => {
                                 </DialogTitle>
                             </DialogHeader>
 
-                            <div className="mt-4 space-y-6">
+                            <div className="mt-4 space-y-10">
                                 {/* User Profile Header */}
                                 <div className="flex flex-col md:flex-row items-center gap-6">
                                     <div className="w-32 h-32 rounded-full overflow-hidden bg-cyan-100">
@@ -298,7 +374,14 @@ const AdminUserManagement = () => {
                                         />
                                     </div>
                                     <div className="text-center md:text-left">
-                                        <h2 className="text-2xl font-bold text-cyan-900">{selectedUser.firstName} {selectedUser.lastName}</h2>
+                                        <h2 className="text-3xl font-bold text-cyan-900">{
+
+                                            selectedUser.firstName && selectedUser.lastName
+                                                ? selectedUser.firstName + ' ' + selectedUser.lastName
+                                                : '[No name]'
+                                        } </h2>
+
+
                                         <div className="flex flex-col md:flex-row md:items-center gap-2 mt-2">
                                             <span className="px-3 py-1 bg-cyan-100 text-cyan-900 rounded-full text-sm inline-block">
                                                 {selectedUser.role.charAt(0) + selectedUser.role.slice(1).toLowerCase()}
@@ -309,10 +392,10 @@ const AdminUserManagement = () => {
                                 </div>
 
                                 {/* User Information */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-cyan-50 p-4 rounded-lg">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-cyan-50 p-10 rounded-lg">
                                     <div>
-                                        <h3 className="text-lg font-semibold text-cyan-900 mb-3">Personal Information</h3>
-                                        <div className="space-y-2">
+                                        <h3 className="text-xl font-semibold text-cyan-900 mb-4">Personal Information</h3>
+                                        <div className="space-y-3">
                                             <div>
                                                 <span className="text-gray-600 font-medium">Gender:</span>
                                                 <span className="ml-2">{selectedUser.gender ? 'Male' : 'Female'}</span>
@@ -327,9 +410,10 @@ const AdminUserManagement = () => {
                                             </div>
                                         </div>
                                     </div>
+
                                     <div>
-                                        <h3 className="text-lg font-semibold text-cyan-900 mb-3">Account Information</h3>
-                                        <div className="space-y-2">
+                                        <h3 className="text-xl font-semibold text-cyan-900 mb-4">Account Information</h3>
+                                        <div className="space-y-3">
                                             <div>
                                                 <span className="text-gray-600 font-medium">User ID:</span>
                                                 <span className="ml-2">{selectedUser.userId}</span>
@@ -346,26 +430,26 @@ const AdminUserManagement = () => {
                                     </div>
                                 </div>
 
+
                                 {/* Bio Section */}
-                                {selectedUser.bio && (
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-cyan-900 mb-2">Bio</h3>
-                                        <p className="text-gray-700 bg-white p-4 rounded-lg border border-cyan-100">
-                                            {selectedUser.bio}
-                                        </p>
-                                    </div>
-                                )}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-cyan-900 mb-4">Bio</h3>
+                                    <p className={`${selectedUser.bio ? "text-gray-700" : "text-gray-500 italic"} bg-white p-4 rounded-lg border border-cyan-100 min-h-20`}>
+                                        {selectedUser.bio ? `${selectedUser.bio}` : "This user hasn't shared their bio yet!"}
+                                    </p>
+                                </div>
+
 
                                 {/* Event Statistics */}
-                                <div>
+                                {/* <div>
                                     <h3 className="text-lg font-semibold text-cyan-900 mb-3">Activity Summary</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {/* <div className="bg-white p-4 rounded-lg border border-cyan-100 text-center">
+                                        <div className="bg-white p-4 rounded-lg border border-cyan-100 text-center">
                                             <p className="text-3xl font-bold text-cyan-900">{selectedUser.events?.length || 0}</p>
                                             <p className="text-gray-600">
                                                 {userRole === 'ORGANIZER' ? 'Events Created' : 'Events Attended'}
                                             </p>
-                                        </div> */}
+                                        </div>
                                         {userRole === 'ATTENDEE' && (
                                             <>
                                                 <div className="bg-white p-4 rounded-lg border border-cyan-100 text-center">
@@ -391,7 +475,7 @@ const AdminUserManagement = () => {
                                             </>
                                         )}
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </>
                     )}

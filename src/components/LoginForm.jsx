@@ -73,7 +73,8 @@ const LoginForm = () => {
             });
             if (response.status === 200) {
                 const { token } = response.data.result;
-                location.reload();
+                setIsRegister(false)
+                setMessage('')
                 toast.success("Registration successful!", {
                     autoClose: 3000,
                 });
@@ -117,14 +118,14 @@ const LoginForm = () => {
             <div className="grid gap-6 mx-2 pt-3">
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="m@example.com" required className='h-10' onChange={(e) => setEmail(e.target.value)}
+                    <Input id="email" type="email" autoComplete="email" placeholder="m@example.com" required className='h-10' onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 <div className="grid gap-2">
                     <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
                     </div>
-                    <Input id="password" type="password" autoComplete="current-password"
+                    <Input id="password" type="password" autoComplete="new-password" placeholder="your password"
                         required onChange={(e) => setPassword(e.target.value)} />
                 </div>
 

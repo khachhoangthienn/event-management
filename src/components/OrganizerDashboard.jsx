@@ -8,6 +8,7 @@ import { FiCheckCircle } from "react-icons/fi";
 import moment from "moment";
 import { NotificationContext } from "@/context/NotificationContext";
 import { FaRegMoneyBillAlt } from "react-icons/fa";
+import { MdWarning } from 'react-icons/md';
 
 
 
@@ -129,16 +130,30 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
                         <h2 className="text-xl font-bold text-cyan-900">Events & Attendees</h2>
                         <FiBarChart2 className="text-cyan-900 text-xl" />
                     </div>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={monthlyData}>
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="events" fill="#164e63" />
-                                <Bar dataKey="attendees" fill="#22d3ee" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <div className="h-64 flex flex-col justify-center">
+                        {monthlyData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={monthlyData}>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Bar dataKey="events" fill="#164e63" />
+                                    <Bar dataKey="attendees" fill="#22d3ee" />
+                                </BarChart>
+                            </ResponsiveContainer>) : (
+                            <div className="flex flex-col items-center justify-center py-6 text-gray-600 border-2 border-gray-200 rounded-2xl">
+                                <MdWarning className="text-5xl text-cyan-900 mb-2" />
+                                <p className="font-semibold text-xl">No Data Available!</p>
+                                <p className="text-lg text-gray-500 mt-1">
+                                    It looks like there's no data to display.
+                                </p>
+                                <p className="text-lg text-gray-500 mt-1">
+                                    Please try again later!
+                                </p>
+                            </div>
+
+                        )}
+
                     </div>
                 </div>
 
@@ -148,15 +163,29 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
                         <h2 className="text-xl font-bold text-cyan-900">Revenue Trend</h2>
                         <FiActivity className="text-cyan-900 text-xl" />
                     </div>
-                    <div className="h-64"> {/* Tăng chiều cao */}
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={formattedRevenueData}>
-                                <XAxis dataKey="name" tickMargin={10} angle={-45} textAnchor="end" fontSize={12} />
-                                <YAxis tickFormatter={(value) => `${value}K`} tickMargin={10} allowDecimals={false} fontSize={12} />
-                                <Tooltip formatter={(value) => `${value}K VND`} />
-                                <Line type="monotone" dataKey="revenue" stroke="#164e63" strokeWidth={2} />
-                            </LineChart>
-                        </ResponsiveContainer>
+                    <div className="h-64  flex flex-col justify-center">
+                        {formattedRevenueData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={formattedRevenueData}>
+                                    <XAxis dataKey="name" tickMargin={10} angle={-45} textAnchor="end" fontSize={12} />
+                                    <YAxis tickFormatter={(value) => `${value}K`} tickMargin={10} allowDecimals={false} fontSize={12} />
+                                    <Tooltip formatter={(value) => `${value}K VND`} />
+                                    <Line type="monotone" dataKey="revenue" stroke="#164e63" strokeWidth={2} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-6 text-gray-600 border-2 border-gray-200 rounded-2xl">
+                                <MdWarning className="text-5xl text-cyan-900 mb-2" />
+                                <p className="font-semibold text-xl">No Data Available!</p>
+                                <p className="text-lg text-gray-500 mt-1">
+                                    It looks like there's no data to display.
+                                </p>
+                                <p className="text-lg text-gray-500 mt-1">
+                                    Please try again later!
+                                </p>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </div>
@@ -167,17 +196,31 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
                     <h2 className="text-xl font-bold text-cyan-900">Growth Rate</h2>
                     <MdWaterfallChart className="text-cyan-900 text-xl" />
                 </div>
-                <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={growthRateData}>
-                            <XAxis
-                                dataKey="name"
-                            />
-                            <YAxis domain={['auto', 'auto']} tickFormatter={(tick) => `${tick}%`} />
-                            <Tooltip formatter={(value) => `${value}%`} />
-                            <Line type="linear" dataKey="growthRate" stroke="black" strokeWidth={2} dot={{ r: 5 }} />
-                        </LineChart>
-                    </ResponsiveContainer>
+                <div className="h-64  flex flex-col justify-center">
+                    {growthRateData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={growthRateData}>
+                                <XAxis
+                                    dataKey="name"
+                                />
+                                <YAxis domain={['auto', 'auto']} tickFormatter={(tick) => `${tick}%`} />
+                                <Tooltip formatter={(value) => `${value}%`} />
+                                <Line type="linear" dataKey="growthRate" stroke="black" strokeWidth={2} dot={{ r: 5 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-6 text-gray-600 border-2 border-gray-200 rounded-2xl">
+                            <MdWarning className="text-5xl text-cyan-900 mb-2" />
+                            <p className="font-semibold text-xl">No Data Available!</p>
+                            <p className="text-lg text-gray-500 mt-1">
+                                It looks like there's no data to display.
+                            </p>
+                            <p className="text-lg text-gray-500 mt-1">
+                                Please try again later!
+                            </p>
+                        </div>
+                    )}
+
                 </div>
             </div>
 

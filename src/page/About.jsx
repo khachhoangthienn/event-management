@@ -35,7 +35,7 @@ const About = () => {
                             </div>
                             {/* image */}
                             <div className='w-full md:w-1/4'>
-                                <img src="https://www.meydanfz.ae/wp-content/uploads/2021/10/Events.png" className='object-cover rounded-2xl' alt="" />
+                                <img src="https://st3.depositphotos.com/15310008/18422/i/450/depositphotos_184221834-stock-photo-group-people-having-party-roof.jpg" className='object-cover rounded-2xl' alt="" />
                             </div>
                         </div>
                         {/* content2 */}

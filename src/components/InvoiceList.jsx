@@ -93,7 +93,7 @@ const InvoiceList = () => {
     const closeDetail = () => {
         setSelectedInvoice(null);
     };
-    if (invoices.length === 0) return
+    // if (invoices.length === 0) return
     return (
         <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white p-6">
             <div className="max-w-6xl mx-auto space-y-6">
@@ -128,9 +128,8 @@ const InvoiceList = () => {
                         </select>
                     </div>
                 </div>
-
                 {/* Invoices List */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 min-h-[90vh]">
+                {filteredInvoices.length != 0 && (<div div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 min-h-[90vh]">
                     {filteredInvoices.map((invoice) => (
                         <div key={invoice.invoiceId} className="bg-white rounded-2xl shadow-md overflow-hidden border border-cyan-100 group w-full h-fit mx-auto">
                             {/* Invoice Header */}
@@ -186,7 +185,9 @@ const InvoiceList = () => {
                             </div>
                         </div>
                     ))}
-                </div>
+                </div>)}
+
+
 
                 {/* Empty State */}
                 {filteredInvoices.length === 0 && (
@@ -203,154 +204,160 @@ const InvoiceList = () => {
                     </div>
                 )}
 
-                <div className="flex justify-center mt-4 space-x-2">
-                    <button
-                        className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        disabled={currentPage === 1}
-                    >
-                        Previous
-                    </button>
+                {filteredInvoices.length > 0 && (
+                    <div className="flex justify-center mt-4 space-x-2">
+                        <button
+                            className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
 
-                    <span className="px-4 py-2">{currentPage}</span>
+                        <span className="px-4 py-2">{currentPage}</span>
 
-                    <button
-                        className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        disabled={indexOfLast >= allInvoices.length}
-                    >
-                        Next
-                    </button>
-                </div>
+                        <button
+                            className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={indexOfLast >= allInvoices.length}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
+
+
             </div>
 
             {/* Invoice Detail Modal */}
-            {selectedInvoice && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-lg max-w-3xl w-full max-h-90vh overflow-y-auto">
-                        {/* Modal Header */}
-                        <div className="bg-cyan-900 text-white p-6 rounded-t-2xl flex justify-between items-center">
-                            <h2 className="text-2xl font-bold">Invoice Detail</h2>
-                            <button
-                                onClick={closeDetail}
-                                className="text-white hover:text-cyan-200 transition-colors"
-                            >
-                                <FiX className="text-2xl" />
-                            </button>
-                        </div>
-
-                        {/* Modal Content */}
-                        <div className="p-6">
-                            {/* Event Information */}
-                            <div className="mb-8">
-                                <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Event Information</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Event Name:</span>
-                                            <span className="text-cyan-900 font-medium">{selectedInvoice.eventName}</span>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Location:</span>
-                                            <span className="text-cyan-900">{selectedInvoice.eventLocation}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Start Time:</span>
-                                            <span className="text-cyan-900">{formatDate(selectedInvoice.startTime)}</span>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">End Time:</span>
-                                            <span className="text-cyan-900">{formatDate(selectedInvoice.endTime)}</span>
-                                        </div>
-                                    </div>
-                                </div>
+            {
+                selectedInvoice && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-2xl shadow-lg max-w-3xl w-full max-h-90vh overflow-y-auto">
+                            {/* Modal Header */}
+                            <div className="bg-cyan-900 text-white p-6 rounded-t-2xl flex justify-between items-center">
+                                <h2 className="text-2xl font-bold">Invoice Detail</h2>
+                                <button
+                                    onClick={closeDetail}
+                                    className="text-white hover:text-cyan-200 transition-colors"
+                                >
+                                    <FiX className="text-2xl" />
+                                </button>
                             </div>
 
-                            {/* Payment Information */}
-                            <div className="mb-8">
-                                <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Payment Information</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Payment ID:</span>
-                                            <span className="text-cyan-900 font-mono">{selectedInvoice.paymentId}</span>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Date:</span>
-                                            <span className="text-cyan-900">{formatDate(selectedInvoice.createdAt)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Method:</span>
-                                            <span className="text-cyan-900">{selectedInvoice.paymentMethod}</span>
-                                        </div>
-                                        {selectedInvoice.bankCode && (
+                            {/* Modal Content */}
+                            <div className="p-6">
+                                {/* Event Information */}
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Event Information</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
                                             <div className="flex items-start">
-                                                <span className="text-gray-500 w-32">Bank:</span>
-                                                <span className="text-cyan-900">{selectedInvoice.bankCode}</span>
+                                                <span className="text-gray-500 w-32">Event Name:</span>
+                                                <span className="text-cyan-900 font-medium">{selectedInvoice.eventName}</span>
                                             </div>
-                                        )}
-                                        {selectedInvoice.cardType && (
                                             <div className="flex items-start">
-                                                <span className="text-gray-500 w-32">Card Type:</span>
-                                                <span className="text-cyan-900">{selectedInvoice.cardType}</span>
+                                                <span className="text-gray-500 w-32">Location:</span>
+                                                <span className="text-cyan-900">{selectedInvoice.eventLocation}</span>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Ticket Information */}
-                            <div className="mb-8">
-                                <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Ticket Information</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Package:</span>
-                                            <span className="text-cyan-900">{selectedInvoice.packageName}</span>
                                         </div>
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Unit Price:</span>
-                                            <span className="text-cyan-900">{formatCurrency(selectedInvoice.packagePrice)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Quantity:</span>
-                                            <span className="text-cyan-900">{selectedInvoice.quantity}</span>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Total Amount:</span>
-                                            <span className="text-cyan-900 font-semibold">{formatCurrency(selectedInvoice.amount)}</span>
+                                        <div className="space-y-2">
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Start Time:</span>
+                                                <span className="text-cyan-900">{formatDate(selectedInvoice.startTime)}</span>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">End Time:</span>
+                                                <span className="text-cyan-900">{formatDate(selectedInvoice.endTime)}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Purchaser Information */}
-                            <div>
-                                <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Purchaser Information</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Name:</span>
-                                            <span className="text-cyan-900">{selectedInvoice.firstName} {selectedInvoice.lastName}</span>
+                                {/* Payment Information */}
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Payment Information</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Payment ID:</span>
+                                                <span className="text-cyan-900 font-mono">{selectedInvoice.paymentId}</span>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Date:</span>
+                                                <span className="text-cyan-900">{formatDate(selectedInvoice.createdAt)}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-start">
-                                            <span className="text-gray-500 w-32">Email:</span>
-                                            <span className="text-cyan-900">{selectedInvoice.email}</span>
+                                        <div className="space-y-2">
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Method:</span>
+                                                <span className="text-cyan-900">{selectedInvoice.paymentMethod}</span>
+                                            </div>
+                                            {selectedInvoice.bankCode && (
+                                                <div className="flex items-start">
+                                                    <span className="text-gray-500 w-32">Bank:</span>
+                                                    <span className="text-cyan-900">{selectedInvoice.bankCode}</span>
+                                                </div>
+                                            )}
+                                            {selectedInvoice.cardType && (
+                                                <div className="flex items-start">
+                                                    <span className="text-gray-500 w-32">Card Type:</span>
+                                                    <span className="text-cyan-900">{selectedInvoice.cardType}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Ticket Information */}
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Ticket Information</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Package:</span>
+                                                <span className="text-cyan-900">{selectedInvoice.packageName}</span>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Unit Price:</span>
+                                                <span className="text-cyan-900">{formatCurrency(selectedInvoice.packagePrice)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Quantity:</span>
+                                                <span className="text-cyan-900">{selectedInvoice.quantity}</span>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Total Amount:</span>
+                                                <span className="text-cyan-900 font-semibold">{formatCurrency(selectedInvoice.amount)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Purchaser Information */}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-cyan-900 mb-4 pb-2 border-b border-cyan-100">Purchaser Information</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Name:</span>
+                                                <span className="text-cyan-900">{selectedInvoice.firstName} {selectedInvoice.lastName}</span>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <span className="text-gray-500 w-32">Email:</span>
+                                                <span className="text-cyan-900">{selectedInvoice.email}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

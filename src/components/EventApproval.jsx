@@ -15,6 +15,10 @@ const AdminEventApproval = () => {
     const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
     const currentEvents = eventsSystem.slice(indexOfFirstEvent, indexOfLastEvent);
 
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [filterStatus])
+
     const fetchEvents = async () => {
         try {
             const response = await axiosPublic.get(`/events?status=${filterStatus.toUpperCase()}`);

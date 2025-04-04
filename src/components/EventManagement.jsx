@@ -6,6 +6,7 @@ import CreateEventForm from './EditEventModal';
 import UpdateEventForm from './UpdateEventModal';
 import { axiosInstance, axiosPublic } from '@/axiosConfig';
 import confirmToast from './ui/confirmToast';
+import { UserContext } from '@/context/UserContext';
 
 const EventManagement = () => {
     const [myEvents, setMyEvents] = useState([]);
@@ -18,6 +19,8 @@ const EventManagement = () => {
     const indexOfLastEvent = currentPage * eventsPerPage;
     const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
     const currentEvents = myEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+    const { info } = useContext(UserContext);
+
 
     const getMyEvents = async () => {
         try {
@@ -105,7 +108,13 @@ const EventManagement = () => {
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-cyan-900">Event Management</h1>
                 <button
-                    onClick={() => setIsCreateModalOpen(true)}
+                    onClick={() => {
+                        if (info && info.role == 'ORGANIZER' && info.firstName == null) {
+                            toast.warning("Please update your profile to add new events!", { autoClose: 1700 });
+                            return
+                        }
+                        setIsCreateModalOpen(true)
+                    }}
                     className="flex items-center gap-2 bg-cyan-900 text-white px-4 py-2 rounded-lg hover:bg-cyan-800"
                 >
                     <FiPlus /> Create Event

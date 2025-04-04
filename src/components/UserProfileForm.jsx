@@ -147,12 +147,13 @@ const UserProfile = () => {
                         <div className="absolute top-4 right-4 flex space-x-2">
                             {isEditMode ? (
                                 <>
-                                    <button
+                                    {info.firstName !== null && (<button
                                         onClick={cancelEdit}
                                         className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
                                     >
                                         <FaTimes />
-                                    </button>
+                                    </button>)}
+
                                     <button
                                         id="save-btn"
                                         type="submit"

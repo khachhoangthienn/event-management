@@ -31,9 +31,60 @@ const Details = () => {
     // Set input of comment by onChange
     const [inputComment, setInputComment] = useState("")
     const [rating, setRating] = useState(0)
+    const [avgRating, setAvgRating] = useState(0)
     const [countRating, setCountRating] = useState(0)
     // favourite
-    const [isFavourite, setIsFavourite] = useState(false)
+    const [isFavourite, setIsFavourite] = useState(null)
+    const [isComment, setIsComment] = useState(null)
+    const [isJoined, setIsJoined] = useState(null)
+    const [isLoading, setIsloading] = useState(false)
+
+    const fetchIsJoined = async () => {
+        console.log("calling")
+        if (!info) return;
+        try {
+            const response = await axiosInstance.get(`/events/${eventId}/is-joined`);
+            if (response.status === 200) {
+                console.log("result", response.data.result)
+                setIsJoined(response.data.result);
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    }
+
+    const fetchIsComment = async (eventId) => {
+        if (!info) return;
+        try {
+            const response = await axiosInstance.get(`/reviews/${eventId}/reviewed`);
+            if (response.status === 200) {
+                console.log("result", response.data.result)
+                setIsComment(response.data.result);
+            }
+        } catch (error) {
+            console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
+            if (error.response) {
+                const { code } = error.response.data;
+                if (code === 404) {
+                    console.error("No data found.");
+                } else if (code === 401) {
+                    console.error("Unauthorized request.");
+                }
+            } else {
+                console.error("Error:", error.message);
+            }
+        }
+    }
 
     const fetchFavourite = async (eventId) => {
         if (!info) return;
@@ -59,10 +110,13 @@ const Details = () => {
 
     const fetchDetailsEvent = async (eventId) => {
         try {
+            setIsloading(true)
             const response = await axiosPublic.get(`/events/${eventId}`);
             if (response.status === 200) {
                 setEventInfo(response.data.result);
-                fetchFavourite(eventId);
+                fetchFavourite(response.data.result.eventId);
+                fetchIsComment(response.data.result.eventId);
+                fetchIsJoined(response.data.result.eventId);
                 fetchComments();
             }
         } catch (error) {
@@ -77,6 +131,8 @@ const Details = () => {
             } else {
                 console.error("Error:", error.message);
             }
+        } finally {
+            setIsloading(false)
         }
     };
 
@@ -106,15 +162,15 @@ const Details = () => {
         try {
             const response = await axiosInstance.get(`/reviews/${eventId}`);
             if (response.status === 200) {
+                const newComments = response.data.result;
                 setComments(response.data.result);
-                console.log(response.data.result);
                 setCountRating(response.data.result.length)
                 const averageRating =
-                    comments.length > 0
-                        ? comments.reduce((sum, review) => sum + review.rating, 0) / comments.length
+                    newComments.length > 0
+                        ? newComments.reduce((sum, review) => sum + review.rating, 0) / newComments.length
                         : 0;
-
-                setRating(parseFloat(averageRating.toFixed(2)));
+                console.log(averageRating)
+                setAvgRating(parseFloat(averageRating.toFixed(2)));
             }
         } catch (error) {
             console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
@@ -130,6 +186,11 @@ const Details = () => {
             }
         }
     };
+
+    useEffect(() => {
+        scroll(0, 0)
+        fetchDetailsEvent(eventId);
+    }, [])
 
     const pushComment = async () => {
         if (!info) return;
@@ -144,6 +205,7 @@ const Details = () => {
                 fetchComments();
                 setRating(0);
                 setInputComment("");
+                setIsComment(true)
             }
         } catch (error) {
             console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
@@ -161,13 +223,25 @@ const Details = () => {
     };
 
 
-
     useEffect(() => {
-        fetchDetailsEvent(eventId)
-    }, [eventId]);
+        if (info) {
+            fetchDetailsEvent(eventId);
+        }
+    }, [info]);
 
-    if (!eventInfo) return <SkeletonCard />
+    console.log("info", info)
+    console.log("eventInfo", eventInfo)
+    console.log("isJoined", isJoined)
+    console.log("isFavourite", isFavourite)
+    console.log("isComment", isComment)
 
+
+    // if (!eventInfo || isJoined == null || isFavourite == null || isComment == null) return <SkeletonCard />
+    if (isLoading || !eventInfo) return <SkeletonCard />
+
+    console.log("joined", isJoined)
+    console.log("Comment?", isComment)
+    if (info) console.log("user id", info.userId)
     return (
         <div className='flex flex-col container items-center gap-6 justify-center mx-auto py-10 px-6 md:px-20 lg:px-32 relative'>
             {/* ---------------> Tittle <-------------- */}
@@ -200,7 +274,7 @@ const Details = () => {
                             </div>
                         </div>
                         <div className='flex flex-col items-center'>
-                            <ReactStars count={5} size={26} value={rating} edit={false} />
+                            <ReactStars count={5} size={26} value={avgRating} edit={false} />
                             <p>{countRating} Ratings</p>
                         </div>
                     </div>
@@ -230,78 +304,85 @@ const Details = () => {
                         </div>
                         <div className='absolute flex-row gap-4 w-auto h-auto py-2 right-0 top-0 flex justify-center items-center text-cyan-900 text-sm'>
                             <p>{countRating} Ratings</p>
-                            <ReactStars count={5} size={26} value={rating} edit={false} />
+                            <ReactStars count={5} size={26} value={avgRating} edit={false} />
                         </div>
 
-                        <div className='flex flex-col py-20 text-justify gap-5'>
-                            {/* Comment bar */}
+                        {eventInfo.eventStatus === 'FINISHED' ?
+                            (<div className='flex flex-col py-20 text-justify gap-5'>
+                                {/* Comment bar */}
 
-                            {info &&
-                                <div className='flex gap-4 py-5 border-b'>
-                                    <img src={info.avatarUrl} alt="" className='size-12 aspect-square object-cover rounded-full' />
-                                    <div className='w-full'>
-                                        <div className='flex gap-2 items-center'>
-                                            <p className='font-semibold text-lg'>{info.firstName} {info.lastName}</p>
-                                            <ReactStars count={5} size={26} value={rating} onChange={setRating} />
+                                {info && info.role == "ATTENDEE" && isComment === false && isJoined &&
+                                    <div className='flex gap-4 py-5 border-b'>
+                                        <img src={info.avatarUrl} alt="" className='size-12 aspect-square object-cover rounded-full' />
+                                        <div className='w-full'>
+                                            <div className='flex gap-2 items-center'>
+                                                <p className='font-semibold text-lg'>{info.firstName} {info.lastName}</p>
+                                                <ReactStars count={5} size={26} value={rating} onChange={setRating} />
+                                            </div>
+                                            <div className='flex gap-3 rounded-3xl bg-gray-200 p-2 w-full items-center'>
+                                                <input placeholder='Input your comment here'
+                                                    value={inputComment}
+                                                    onChange={(e) => setInputComment(e.target.value)}
+                                                    className='flex flex-1 rounded-full bg-none justify-center min-h-10 l px-4'></input>
+                                                <IoMdSend
+                                                    onClick={() => pushComment()}
+                                                    className='size-7 mr-2 cursor-pointer' />
+                                            </div>
                                         </div>
-                                        <div className='flex gap-3 rounded-3xl bg-gray-200 p-2 w-full items-center'>
-                                            <input placeholder='Input your comment here'
-                                                value={inputComment}
-                                                onChange={(e) => setInputComment(e.target.value)}
-                                                className='flex flex-1 rounded-full bg-none justify-center min-h-10 l px-4'></input>
-                                            <IoMdSend
-                                                onClick={() => pushComment()}
-                                                className='size-7 mr-2 cursor-pointer' />
-                                        </div>
-                                    </div>
-                                </div>}
+                                    </div>}
 
 
-                            {/* Comment */}
-                            {comments.length > 0 && comments.map((comment, index) => (
-                                <div key={index} className='flex gap-4'>
-                                    {/* Ảnh đại diện */}
-                                    <img
-                                        src={comment.user.avatarUrl}
-                                        alt="Noname"
-                                        className='size-12 aspect-square object-cover rounded-full'
-                                    />
-
-                                    {/* Nội dung bình luận */}
-                                    <div className='flex flex-col justify-center'>
-                                        <div className="flex items-center gap-2">
-                                            <p className='font-semibold text-lg'>{comment.user.firstName} {comment.user.lastName}</p>
-                                            <span className="text-sm text-gray-500">
-                                                {moment(comment.createdAt).fromNow()}
-                                            </span>
-                                        </div>
-
-                                        {/* Đánh giá sao */}
-                                        <ReactStars
-                                            count={5}
-                                            size={26}
-                                            value={comment.rating}
-                                            edit={false}
-                                            className='my-[-5px]'
+                                {/* Comment */}
+                                {comments.length > 0 && comments.map((comment, index) => (
+                                    <div key={index} className='flex gap-4'>
+                                        {/* Ảnh đại diện */}
+                                        <img
+                                            src={comment.user.avatarUrl}
+                                            alt="Noname"
+                                            className='size-12 aspect-square object-cover rounded-full'
                                         />
 
                                         {/* Nội dung bình luận */}
-                                        <p className='font-light'>{comment.comment}</p>
+                                        <div className='flex flex-col justify-center'>
+                                            <div className="flex items-center gap-2">
+                                                <p className='font-semibold text-lg'>{comment.user.firstName} {comment.user.lastName}</p>
+                                                <span className="text-sm text-gray-500">
+                                                    {moment(comment.createdAt).fromNow()}
+                                                </span>
+                                            </div>
+
+                                            {/* Đánh giá sao */}
+                                            <ReactStars
+                                                count={5}
+                                                size={26}
+                                                value={comment.rating}
+                                                edit={false}
+                                                className='my-[-5px]'
+                                            />
+
+                                            {/* Nội dung bình luận */}
+                                            <p className='font-light'>{comment.comment}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
 
-                            {comments.length == 0 &&
-                                <div className='flex justify-center'>
-                                    <p>No comment yet!</p>
-                                </div>}
+                                {comments.length == 0 &&
+                                    <div className="flex flex-col pt-10 text-justify items-center gap-5 text-black p-10 rounded-lg shadow-lg">
+                                        <h2 className="text-3xl font-bold mb-4">Currently, there are no reviews</h2>
+                                        <p className="text-lg">Feel free to leave your feedback!</p>
+                                    </div>}
 
-                            {/* 
+                                {/* 
                             <div className='flex justify-center'>
                                 <a className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10 hover:bg-cyan-900 hover:text-white duration-300 cursor-pointer'>See more</a>
                             </div> */}
 
-                        </div>
+                            </div>) :
+                            (<div className="flex flex-col pt-24 text-justify items-center gap-5 text-black p-10 rounded-lg shadow-lg">
+                                <h2 className="text-3xl font-bold mb-4">The event is still going!</h2>
+                                <p className="text-lg">Join us and enjoy the events!</p>
+                            </div>
+                            )}
                     </div>
 
                 </div> {/* end of left side */}
@@ -372,19 +453,29 @@ const Details = () => {
                                         <CiBoxList className='size-10 text-red-700 font-bold' />
                                         <p><span className='text-6xl text-red-700'>{eventInfo.availableTickets}</span>/{eventInfo.totalTickets} seats </p>
                                     </div>
-                                    <p className='text-2xl'>available now!</p>
+                                    {eventInfo.eventStatus === 'FINISHED' ? (<p className='text-2xl text-red-600'>This event has ended</p>) : (<p className='text-2xl'>available now!</p>)}
+
                                 </div>
                                 {/* {eventInfo.endTime < new Date() ? ( */}
-                                <div onClick={() => {
-                                    if (info && info.role == "ATTENDEE") {
+                                {eventInfo.eventStatus === 'FINISHED' ? (<div
+                                    className='gap-4 bg-black rounded-tr-2xl rounded-2xl px-4 min-w-fit py-5 mb-7 flex justify-center items-center text-white font-semibold text-3xl'>
+                                    <LuTicketCheck />
+                                    <p>Event ended!</p>
+                                </div>) : (<div onClick={() => {
+                                    if (info && info.role == "ATTENDEE" && info.firstName === null) {
+                                        toast.warning("Please update your personal information to continue purchasing tickets!", { autoClose: 1700 });
+                                    }
+                                    else if (info && info.role == "ATTENDEE") {
                                         navigate(`pricing-plan`, { state: { eventInfo } })
-                                    } else {
+                                    }
+                                    else {
                                         toast.warning("Please log in with an attendee account to buy tickets!", { autoClose: 1700 });
                                     }
                                 }} className='gap-4 bg-red-700 rounded-tr-2xl hover:scale-110 cursor-pointer transition-all duration-300 rounded-2xl px-4 min-w-fit py-5 mb-7 flex justify-center items-center text-white font-semibold text-3xl'>
                                     <LuTicketCheck />
                                     <p>Buy ticket now!</p>
-                                </div>
+                                </div>)}
+
                             </div>
                         </div>
                     </div>

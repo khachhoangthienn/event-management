@@ -12,6 +12,12 @@ const EventContextProvider = (props) => {
     const [topEvents, setTopEvents] = useState([])
     const { info } = useContext(UserContext)
 
+    const [isComing, setIsComing] = useState(false)
+
+    const setFlipComing = () => {
+        setIsComing(!isComing);
+    };
+
     const fetchTypes = async () => {
         try {
             const response = await axiosPublic.get("/types");
@@ -36,7 +42,7 @@ const EventContextProvider = (props) => {
 
     const fetchPopularEvents = async () => {
         try {
-            const response = await axiosPublic.get(`/events?status=APPROVED`);
+            const response = await axiosPublic.get(`/events?status=${isComing ? "FINISHED" : "APPROVED"}`);
             if (response.status === 200) {
                 setPopularEvents(response.data.result);
             }
@@ -57,7 +63,7 @@ const EventContextProvider = (props) => {
 
     const fetchTopEvents = async () => {
         try {
-            const response = await axiosPublic.get(`/events/top-events`);
+            const response = await axiosPublic.get(`/events/top-events-by-favourites`);
             if (response.status === 200) {
                 setTopEvents(response.data.result);
             }
@@ -105,7 +111,7 @@ const EventContextProvider = (props) => {
         fetchPopularEvents();
         fetchTopEvents();
         fetchTypes();
-    }, []);
+    }, [isComing]);
 
     useEffect(() => {
         if (info) {
@@ -122,6 +128,8 @@ const EventContextProvider = (props) => {
         topEvents,
         recommendEvent,
         fetchRecommendEvents,
+        setFlipComing,
+        isComing
     }
 
     return (

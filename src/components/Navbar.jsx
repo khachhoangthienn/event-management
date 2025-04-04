@@ -23,7 +23,6 @@ const Navbar = () => {
         navigate(`/login`);
         toast.success("Logout successful!")
     }
-    // This is commit for testing navbar
     return (
         <div className='absolute top-0 left-0 w-full z-10 text-lg'>
             <div className='container mx-auto flex justify-between items-center py-4 px-6 md:px-20 lg:px-32 bg-transparent'>

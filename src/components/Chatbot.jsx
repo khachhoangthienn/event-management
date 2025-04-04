@@ -16,7 +16,6 @@ const Chatbot = () => {
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
-    const typingRef = useRef(null);
     const chatbotPositionRef = useRef({ x: 0, y: 0 });
 
     const [bottyEmotion, setBottyEmotion] = useState('happy');
@@ -180,7 +179,7 @@ const Chatbot = () => {
 
         return (
             <div className="relative h-10 w-10 overflow-hidden rounded-full bg-cyan-100 animate-pulse">
-                {expressions[emotion]}
+                <img src="/chatbotgif.webp" alt="Chatbot" />
             </div>
         );
     };
@@ -239,18 +238,16 @@ const Chatbot = () => {
                                 <TooltipTrigger asChild>
                                     <Button
                                         onClick={toggleChatbot}
-                                        className="h-16 w-16 rounded-full bg-cyan-900 hover:bg-cyan-800 transition-all duration-300 shadow-lg flex items-center justify-center"
+                                        className="h-16 w-16 rounded-full hover:scale-125 bg-cyan-900 hover:bg-cyan-800 transition-all duration-300 shadow-lg flex items-center justify-center"
                                         aria-label="Open chat assistant"
                                     >
-                                        <div className="relative">
-                                            <MessageCircle className="h-7 w-7 text-white" />
-                                            <span className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full animate-ping"></span>
-                                            <span className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full"></span>
+                                        <div className="relative scale-125">
+                                            <BottyAvatar />
                                         </div>
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Mở trợ lý ảo</p>
+                                    <p>Open chatbot assistant</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
