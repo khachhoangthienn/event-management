@@ -3,13 +3,11 @@ import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { IoMdArrowDropdown } from "react-icons/io";
 import { UserContext } from '@/context/UserContext';
-import { axiosPublic, axiosInstance } from '@/axiosConfig';
 import { toast } from 'react-toastify';
 
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const [showMenu, setShowMenu] = useState(false);
     const { info, setInfo, getUserInfo } = useContext(UserContext);
 
     useEffect(() => {
@@ -25,7 +23,7 @@ const Navbar = () => {
         navigate(`/login`);
         toast.success("Logout successful!")
     }
-
+    // This is commit for testing navbar
     return (
         <div className='absolute top-0 left-0 w-full z-10 text-lg'>
             <div className='container mx-auto flex justify-between items-center py-4 px-6 md:px-20 lg:px-32 bg-transparent'>
