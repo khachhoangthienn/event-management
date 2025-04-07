@@ -229,19 +229,11 @@ const Details = () => {
         }
     }, [info]);
 
-    console.log("info", info)
-    console.log("eventInfo", eventInfo)
-    console.log("isJoined", isJoined)
-    console.log("isFavourite", isFavourite)
-    console.log("isComment", isComment)
-
 
     // if (!eventInfo || isJoined == null || isFavourite == null || isComment == null) return <SkeletonCard />
     if (isLoading || !eventInfo) return <SkeletonCard />
 
-    console.log("joined", isJoined)
-    console.log("Comment?", isComment)
-    if (info) console.log("user id", info.userId)
+
     return (
         <div className='flex flex-col container items-center gap-6 justify-center mx-auto py-10 px-6 md:px-20 lg:px-32 relative'>
             {/* ---------------> Tittle <-------------- */}
@@ -490,7 +482,7 @@ const Details = () => {
                         <div className='w-full flex-col flex gap-6 pt-28 text-left justify-start px-5 min-h-80 text-xl text-cyan-900 pb-10 md:pb-6'>
                             {/* speaker 1 */}
                             {eventInfo.speakers.map((speaker, index) => (
-                                <div className='flex gap-4 hover:-translate-x-4 hover:scale-105 hover:bg-gray-50 rounded-full bg-white duration-300'>
+                                <div key={index} className='flex gap-4 hover:-translate-x-4 hover:scale-105 hover:bg-gray-50 rounded-full bg-white duration-300'>
                                     <img src={speaker.speakerImageUrl} alt="" className='w-1/3 aspect-square object-cover rounded-full' />
                                     <div className='flex flex-col justify-center'>
                                         <p className='font-semibold text-2xl'>{speaker.speakerName}</p>

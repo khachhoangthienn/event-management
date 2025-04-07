@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle } from "lucide-react";
 
-
-const VnPayCallback = () => {
+export default function StripeCallback() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [countdown, setCountdown] = useState(5);
@@ -28,6 +28,7 @@ const VnPayCallback = () => {
             clearTimeout(redirect);
         };
     }, [navigate]);
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4">
             <Card className="w-full max-w-md shadow-xl rounded-2xl bg-white text-gray-900">
@@ -45,6 +46,13 @@ const VnPayCallback = () => {
                             <p className="text-muted-foreground">Something went wrong during your payment.</p>
                         </>
                     )}
+
+                    {/* <Alert className="bg-gray-100 border-0 text-gray-700">
+                        <AlertTitle>Redirecting in {countdown}s...</AlertTitle>
+                        <AlertDescription>
+                            You’ll be automatically redirected to the homepage.
+                        </AlertDescription>
+                    </Alert> */}
                     <Card className="bg-gray-100 p-4 text-gray-700">
                         <h3 className="text-lg font-semibold">Redirecting in {countdown}s...</h3>
                         <p>You’ll be automatically redirected to the homepage.</p>
@@ -62,5 +70,3 @@ const VnPayCallback = () => {
         </div>
     );
 }
-
-export default VnPayCallback

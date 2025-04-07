@@ -7,6 +7,8 @@ import UpdateEventForm from './UpdateEventModal';
 import { axiosInstance, axiosPublic } from '@/axiosConfig';
 import confirmToast from './ui/confirmToast';
 import { UserContext } from '@/context/UserContext';
+import { TbCalendarEvent } from "react-icons/tb";
+
 
 const EventManagement = () => {
     const [myEvents, setMyEvents] = useState([]);
@@ -143,7 +145,7 @@ const EventManagement = () => {
             {/* Events List */}
             <div className="space-y-4 min-h-[80vh]">
                 {currentEvents.length == 0 && <div className="text-center py-12">
-                    <FiBell className="text-5xl text-cyan-900 mx-auto mb-4" />
+                    <TbCalendarEvent className="text-5xl text-cyan-900 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-cyan-900 mb-2">No events here yet</h3>
                     <p className="text-gray-600">Stay tuned! More events may be added soon.</p>
 
@@ -248,7 +250,7 @@ const EventManagement = () => {
                 ))}
 
             </div>
-            <div className="flex justify-center mt-4 space-x-2">
+            {currentEvents.length > 0 && <div className="flex justify-center mt-4 space-x-2">
                 <button
                     className="px-4 py-2 bg-cyan-900 text-white rounded disabled:opacity-50"
                     onClick={() => setCurrentPage(currentPage - 1)}
@@ -267,6 +269,7 @@ const EventManagement = () => {
                     Next
                 </button>
             </div>
+            }
 
             {isCreateModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

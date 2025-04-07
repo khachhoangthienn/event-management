@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { LuLoaderCircle } from "react-icons/lu";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
 
@@ -23,6 +24,7 @@ const UserProfile = () => {
         oldPassword: '',
         newPassword: ''
     });
+    const navigate = useNavigate();
     const { info, setInfo } = useContext(UserContext);
 
     useEffect(() => {
@@ -116,11 +118,36 @@ const UserProfile = () => {
         setIsEditMode(false);
     };
 
-    const handlePasswordChange = () => {
-        // TODO: Implement actual password change logic
-        console.log('Changing password', passwordData);
-        setIsPasswordModalOpen(false);
-        setPasswordData({ oldPassword: '', newPassword: '' });
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        console.log("change-password")
+        try {
+            // JavaScript - Gửi yêu cầu PUT với tham số qua URL
+            const response = await axiosInstance.put("/users/change-password", null, {
+                params: {
+                    oldPassword: passwordData.oldPassword,
+                    newPassword: passwordData.newPassword
+                }
+            });
+            if (response.status === 200) {
+                localStorage.removeItem("authToken");
+                toast.success("Update passwo successfully!", {
+                    autoClose: 3000,
+                });
+                setIsPasswordModalOpen(false);
+                setInfo(null)
+                navigate("/");
+            }
+        } catch (error) {
+            if (error.response) {
+                toast.warning("Your password not match!", {
+                    autoClose: 3000,
+                });
+            } else {
+                console.error("Error:", error.message);
+                alert("Login failed: " + error.message);
+            }
+        }
     };
 
 
@@ -172,12 +199,12 @@ const UserProfile = () => {
                                     >
                                         <FaEdit className="mr-2" /> Edit Profile
                                     </button>
-                                    {/* <button
+                                    <button
                                         onClick={() => setIsPasswordModalOpen(true)}
                                         className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center"
                                     >
                                         <FaLock className="mr-2" /> Change Password
-                                    </button> */}
+                                    </button>
                                 </>
                             )}
                         </div>
@@ -468,7 +495,8 @@ const UserProfile = () => {
 
             {/* Password Change Modal */}
             {isPasswordModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <form className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                    onSubmit={(e) => handlePasswordChange(e)}>
                     <div className="bg-white p-8 rounded-xl shadow-2xl w-96">
                         <h2 className="text-2xl font-bold mb-6 text-cyan-800">Change Password</h2>
                         <div className="space-y-4">
@@ -479,6 +507,8 @@ const UserProfile = () => {
                                 <input
                                     type="password"
                                     placeholder="old Password"
+                                    autoComplete="new-password"
+                                    required
                                     value={passwordData.oldPassword}
                                     onChange={(e) => setPasswordData(prev => ({
                                         ...prev,
@@ -494,7 +524,9 @@ const UserProfile = () => {
                                 <input
                                     type="password"
                                     placeholder="New Password"
+                                    autoComplete="new-password"
                                     value={passwordData.newPassword}
+                                    required
                                     onChange={(e) => setPasswordData(prev => ({
                                         ...prev,
                                         newPassword: e.target.value
@@ -504,21 +536,28 @@ const UserProfile = () => {
                             </div>
                             <div className="flex justify-end space-x-2">
                                 <button
-                                    onClick={() => setIsPasswordModalOpen(false)}
+                                    type='button'
+                                    onClick={() => {
+                                        setIsPasswordModalOpen(false)
+                                        setPasswordData({
+                                            oldPassword: '',
+                                            newPassword: ''
+                                        })
+                                    }}
                                     className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={handlePasswordChange}
                                     className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                                    type="submit"
                                 >
                                     Change Password
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
             )}
         </div>
     );

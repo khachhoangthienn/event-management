@@ -29,7 +29,6 @@ const LoginForm = () => {
         }
     }
 
-
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -53,6 +52,7 @@ const LoginForm = () => {
                 const { code } = error.response.data;
                 if (code === 404) setMessage("No user found with this email");
                 else if (code === 401) setMessage("Invalid password");
+                else if (code === 3010) setMessage("Your account is locked. Please contact the admin")
             } else {
                 // console.error("Error:", error.message);
                 toast.error("Login failed " + message);
@@ -83,6 +83,7 @@ const LoginForm = () => {
             console.log("this is error code: " + error.response.data.code);
             if (error.response) {
                 const { code } = error.response.data;
+                console.log("data", error.response.data)
                 if (code === 409) setMessage("Email already exists! Please try another email");
                 else if (code === 400) setMessage("Password does not match! Please try again");
             } else {

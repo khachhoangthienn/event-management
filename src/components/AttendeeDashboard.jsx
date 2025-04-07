@@ -35,13 +35,14 @@ const AttendeeDashboard = ({ setActiveMenu }) => {
             const response = await axiosInstance.get(`/stats/attendee/mine`);
             if (response.status === 200) {
                 const stats = response.data.result; // Đây là object
+                console.log(response.data.result.totalSpend)
 
                 // Chuyển stats thành array
                 const formattedStats = [
                     { label: "Events Attended", value: stats.totalEventsBought },
                     { label: "Tickets Bought", value: stats.totalTicketsBought },
                     { label: "Favorite Events", value: stats.numberOfFavourites },
-                    { label: "Total Spent", value: (stats.totalSpend / 1000).toLocaleString() + "K VND" },
+                    { label: "Total Spent", value: stats.totalSpend + " $" },
                 ];
 
 

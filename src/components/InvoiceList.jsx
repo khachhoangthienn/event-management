@@ -26,6 +26,7 @@ const InvoiceList = () => {
                 const response = await axiosInstance.get(`/invoices/mine`);
                 if (response.status === 200) {
                     setAllInvoices(response.data.result)
+                    console.log(response.data.result)
                 }
             } catch (error) {
                 console.log("this is error code: " + (error.response?.data?.code || "Unknown"));
@@ -41,7 +42,6 @@ const InvoiceList = () => {
                 }
             }
         };
-
         getMyInvoices();
     }, [info]);
 
@@ -58,11 +58,12 @@ const InvoiceList = () => {
     };
 
     // Format currency
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(amount);
+    const formatCurrency = (invoice, isUnit = false) => {
+        if (invoice.paymentMethod === "Stripe") {
+            return (isUnit ? invoice.packagePrice : invoice.amount) + " $";
+        }
+
+        return new Intl.NumberFormat('vi-VN').format(isUnit ? invoice.packagePrice * 25000 : invoice.amount * 25000) + " VND";
     };
 
     // Get unique payment methods for filter
@@ -136,11 +137,13 @@ const InvoiceList = () => {
                             <div className="bg-cyan-800 text-white p-4">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <h3 className="text-xl font-semibold">Invoice #{invoice.paymentId}</h3>
+                                        <h3 className="text-xl font-semibold">
+                                            Invoice #{invoice.paymentId.length > 15 ? invoice.paymentId.substring(0, 15) + '...' : invoice.paymentId}
+                                        </h3>
                                         <p className="text-cyan-100 mt-1">{formatDate(invoice.createdAt)}</p>
                                     </div>
                                     <div className="bg-cyan-700 px-4 py-2 rounded-full text-white">
-                                        {formatCurrency(invoice.amount)}
+                                        {formatCurrency(invoice)}
                                     </div>
                                 </div>
                             </div>
@@ -320,7 +323,7 @@ const InvoiceList = () => {
                                             </div>
                                             <div className="flex items-start">
                                                 <span className="text-gray-500 w-32">Unit Price:</span>
-                                                <span className="text-cyan-900">{formatCurrency(selectedInvoice.packagePrice)}</span>
+                                                <span className="text-cyan-900">{formatCurrency(selectedInvoice, true)}</span>
                                             </div>
                                         </div>
                                         <div className="space-y-2">
@@ -330,7 +333,7 @@ const InvoiceList = () => {
                                             </div>
                                             <div className="flex items-start">
                                                 <span className="text-gray-500 w-32">Total Amount:</span>
-                                                <span className="text-cyan-900 font-semibold">{formatCurrency(selectedInvoice.amount)}</span>
+                                                <span className="text-cyan-900 font-semibold">{formatCurrency(selectedInvoice)}</span>
                                             </div>
                                         </div>
                                     </div>

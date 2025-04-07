@@ -13,6 +13,7 @@ import Profile from './page/Profile'
 import { ToastContainer } from 'react-toastify'
 import VnPayCallback from './page/VnPayCallback'
 import Chatbot from './components/Chatbot'
+import StripeCallback from './components/StripeCallBack'
 const App = () => {
   return (
     <div>
@@ -27,6 +28,7 @@ const App = () => {
         <Route path='/contact' element={<Contact />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/payment/vn-pay-callback' element={<VnPayCallback />} />
+        <Route path="/payment/stripe-pay-callback" element={<StripeCallback />} />
       </Routes>
       <Footer />
       <ToastContainer />

@@ -132,7 +132,9 @@ const AdminDashboard = ({ setActiveMenu }) => {
                     <div key={index} className="bg-white p-6 rounded-2xl shadow-md border border-indigo-100">
                         <div className="flex items-center justify-between mb-2">
                             {React.createElement(stats_icons[index], { className: "text-2xl text-indigo-900" })}
-                            <span className="text-3xl font-bold text-cyan-900">{stat.value}</span>
+                            <span className="text-3xl font-bold text-cyan-900">
+                                {stat.value + (index === 2 ? " $" : "")}
+                            </span>
                         </div>
                         <p className="text-gray-600">{stat.label}</p>
                     </div>
