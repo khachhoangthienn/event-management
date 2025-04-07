@@ -107,9 +107,7 @@ const CreateEventForm = ({ onClose, refreshEvent }) => {
 
         setFormData((prev) => ({
             ...prev,
-            typesId: prev.typesId.includes(selectedId)
-                ? prev.typesId.filter(id => id !== selectedId)  // Nếu đã có thì xóa đi (toggle)
-                : [...prev.typesId, selectedId] // Nếu chưa có thì thêm vào
+            typesId: [selectedId]
         }));
     };
     // Speakers handlers
@@ -185,7 +183,6 @@ const CreateEventForm = ({ onClose, refreshEvent }) => {
         setEventImages(prev => prev.filter((_, i) => i !== index));
     };
 
-    console.log(types);
     const renderStep = () => {
         switch (currentStep) {
             case 1:

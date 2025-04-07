@@ -198,7 +198,7 @@ const PricingPlan = () => {
                                             <div className="w-1/3 flex justify-center select-none">{numTicket}</div>
 
                                             <div
-                                                onClick={() => setNumTicket(Math.max(numTicket - 1, 0))}
+                                                onClick={() => setNumTicket(Math.max(numTicket - 1, 1))}
                                                 className="w-1/3 border-l-2 flex justify-center hover:text-red-700 select-none"
                                             >-</div>
                                         </div>

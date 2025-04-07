@@ -117,6 +117,7 @@ const Details = () => {
                 fetchFavourite(response.data.result.eventId);
                 fetchIsComment(response.data.result.eventId);
                 fetchIsJoined(response.data.result.eventId);
+                console.log("result", response.data.result)
                 fetchComments();
             }
         } catch (error) {
