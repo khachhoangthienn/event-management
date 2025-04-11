@@ -51,7 +51,7 @@ const AttendeeHome = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 max-w-5xl space-y-6">
+                <div className="flex-1 flex max-w-5xl space-y-6">
                     {activeMenu === "dashboard" && <AttendeeDashboard setActiveMenu={setActiveMenu} />}
                     {activeMenu === "favorites" && <FavoriteEvents />}
                     {activeMenu === "invoices" && <InvoiceList />}

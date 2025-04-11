@@ -54,6 +54,7 @@ const AdminDashboard = ({ setActiveMenu }) => {
                 setSystemStats(data.systemStats);
                 setMonthlyEventsData(data.monthlyEventsData);
                 setRevenueData(data.revenueData);
+                console.log(data.revenueData)
                 setUserRegistrationData(data.userRegistrationData);
                 setEventTypeDistribution(data.eventTypeDistribution);
                 setPaymentMethodDistribution(data.paymentMethodDistribution);
@@ -90,16 +91,16 @@ const AdminDashboard = ({ setActiveMenu }) => {
     }
 
     // Format revenue data to display in K
-    const formattedRevenueData = revenueData.map(item => ({
-        ...item,
-        revenue: item.revenue / 1000,
-    }));
+    // const formattedRevenueData = revenueData.map(item => ({
+    //     ...item,
+    //     revenue: item.revenue,
+    // }));
 
     return (
         <div className="flex-1 max-w-7xl space-y-6 p-6">
             {/* Welcome Section */}
             <div className="bg-cyan-900 rounded-3xl overflow-hidden">
-                <div className="relative p-8 md:p-12">
+                <div className="relative p-16 sm:p-12 md:p-12">
                     <div className="absolute inset-0 bg-pattern opacity-10"></div>
                     <div className="relative z-10 max-w-3xl">
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -116,7 +117,7 @@ const AdminDashboard = ({ setActiveMenu }) => {
                                 System Statistics
                             </button>
                             <button
-                                onClick={() => setActiveMenu("userManagement")}
+                                onClick={() => setActiveMenu("users")}
                                 className="bg-cyan-700 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-600 transition-colors shadow-lg"
                             >
                                 User Management
@@ -173,13 +174,13 @@ const AdminDashboard = ({ setActiveMenu }) => {
                     </div>
                     <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={formattedRevenueData}>
+                            <LineChart data={revenueData}>
                                 <XAxis dataKey="name" />
-                                <YAxis tickFormatter={(value) => `${value}K`} />
-                                <Tooltip formatter={(value) => `${value}K VND`} />
+                                <YAxis tickFormatter={(value) => `${value}`} />
+                                <Tooltip formatter={(value) => `${value}$`} />
                                 <Legend />
                                 <Line type="monotone" dataKey="revenue" name="Total Revenue" stroke="#4f46e5" strokeWidth={2} />
-                                <Line type="monotone" dataKey="ticketRevenue" name="Ticket Revenue" stroke="#818cf8" strokeWidth={2} />
+                                {/* <Line type="monotone" dataKey="ticketRevenue" name="Ticket Revenue" stroke="#818cf8" strokeWidth={2} /> */}
                             </LineChart>
                         </ResponsiveContainer>
                     </div>

@@ -21,7 +21,7 @@ const AdminHome = () => {
         <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white">
             <div className="flex flex-row justify-center mx-auto py-6 gap-6 px-4 md:px-8 lg:px-12">
                 {/* Left Sidebar */}
-                <div className="hidden md:block w-64 bg-white rounded-2xl shadow-lg border border-cyan-100 relative">
+                <div className="hidden xl:block w-64 bg-white rounded-2xl shadow-lg border border-cyan-100 relative">
                     <div className="p-6 space-y-3 sticky top-4">
                         <h3 className="text-lg font-semibold text-cyan-900 mb-4">Navigation</h3>
                         {[
@@ -47,7 +47,7 @@ const AdminHome = () => {
 
                 {/* Main Content */}
                 <div className="flex-1 max-w-5xl space-y-6">
-                    {activeMenu === "dashboard" && <AdminDashboard />}
+                    {activeMenu === "dashboard" && <AdminDashboard setActiveMenu={setActiveMenu} />}
                     {activeMenu === "events" && <AdminEventApproval />}
                     {activeMenu === "users" && <AdminUserManagement />}
                 </div>

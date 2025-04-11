@@ -6,6 +6,7 @@ import { CiBoxList } from "react-icons/ci";
 import { datimeToEnUS } from '@/utils'
 import { EventContext } from '@/context/EventContext';
 import ReactCardFlip from 'react-card-flip';
+import { Search } from 'lucide-react';
 
 const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) => {
     const navigate = useNavigate()
@@ -53,20 +54,39 @@ const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) =
                     ))}</div>
                 }</div>
                 {categories &&
-                    <ReactCardFlip
-                        isFlipped={isComing}
-                        flipDirection="horizontal"
-                    >
-                        <div
-                            onClick={setFlipComing}
-                            className='cursor-pointer flex font-semibold text items-center justify-end px-4 py-2 rounded-md border-2 border-cyan-900 text-cyan-900 text-lg'>
-                            Coming</div>
-                        <div
-                            onClick={setFlipComing}
+                    <div className='flex flex-row gap-2 justify-end'>
+                        {/* <div className="flex justify-center items-center">
+                            <div className="w-full max-w-xl mx-auto relative group">
+                                <input
+                                    type="text"
+                                    placeholder="Input your event to start finding"
+                                    className="w-full py-2 pl-5 pr-12 rounded-xl border-2 border-gray-600
+                 text-gray-800 text-lg placeholder-gray-500
+                 focus:outline-none focus:ring-4 focus:ring-cyan-600 
+                 group-hover:scale-[1.02] focus:scale-[1.05]
+                 hover:shadow-md focus:shadow-xl
+                 transition-all duration-300 ease-in-out"
+                                />
+                                <button className="absolute right-4 top-1/2 transform -translate-y-1/2 text-cyan-600 hover:text-cyan-900 transition duration-200">
+                                    <Search size={24} />
+                                </button>
+                            </div>
+                        </div> */}
+                        <ReactCardFlip
+                            isFlipped={isComing}
+                            flipDirection="horizontal"
+                        >
+                            <div
+                                onClick={setFlipComing}
+                                className='cursor-pointer flex font-semibold text items-center justify-end px-4 py-2 rounded-md border-2 border-cyan-900 text-cyan-900 text-lg'>
+                                Coming</div>
+                            <div
+                                onClick={setFlipComing}
 
-                            className='cursor-pointer flex font-semibold text items-center justify-end px-4 py-2 rounded-md border-2 border-red-600 text-red-600 text-lg'>
-                            Finished</div>
-                    </ReactCardFlip>
+                                className='cursor-pointer flex font-semibold text items-center justify-end px-4 py-2 rounded-md border-2 border-red-600 text-red-600 text-lg'>
+                                Finished</div>
+                        </ReactCardFlip>
+                    </div>
 
                 }
             </div>
@@ -78,8 +98,6 @@ const GridEvent = ({ title, events, categories, number, slice, col = "auto" }) =
                             <CiBoxList />
                             <p>Event is over</p>
                         </div>) : (
-
-
                             <div className={`absolute bg-cyan-950 text-white font-semibold ${item.availableTickets !== 0 ? "group-hover:bg-white group-hover:text-cyan-900" : "bg-red-800 text-white"}  w-60 h-12 top-44 transition-all duration-300 flex items-center justify-center text-lg gap-2`}>
                                 <CiBoxList />
                                 <p>{item.availableTickets}/{item.totalTickets} seats</p>

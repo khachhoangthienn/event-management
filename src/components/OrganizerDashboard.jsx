@@ -110,7 +110,7 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
             </div>
 
             {/* Stats Grid */}
-            <div id="statistic" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="statistic" className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
                 {stats.map((stat, index) => (
                     <div key={index} className="bg-white p-6 rounded-2xl shadow-md border border-cyan-100">
                         <div className="flex items-center justify-between mb-2">
@@ -123,7 +123,7 @@ const OrganizerDashboard = ({ setActiveMenu }) => {
             </div>
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Events & Attendees Chart */}
                 <div className="bg-white p-6 rounded-2xl shadow-md border border-cyan-100">
                     <div className="flex items-center justify-between mb-6">

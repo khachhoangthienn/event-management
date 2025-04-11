@@ -246,7 +246,7 @@ const AdminUserManagement = () => {
                                                 <span>{user.email}</span>
                                             </div>
                                         </div>
-                                        {isActiveUser ? (<div className="flex h-fit bg-red-500">
+                                        {isActiveUser ? (<div className="flex h-fit md:bg-red-500">
                                             <button
                                                 onClick={(e) => {
                                                     confirmToast("Are you sure you want to block this user?", () => {
